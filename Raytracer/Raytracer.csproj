@@ -34,6 +34,23 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Camera.cs" />
+    <Compile Include="Renderables\CSGObject.cs" />
+    <Compile Include="Renderables\Renderable.cs" />
+    <Compile Include="Point3D.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Ray.cs" />
+    <Compile Include="Scene.cs" />
+    <Compile Include="Renderables\Sphere.cs" />
+    <Compile Include="Vector3D.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="PixelWindowCSharp">
+      <HintPath>..\..\PixelWindow\Release\PixelWindowCSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
