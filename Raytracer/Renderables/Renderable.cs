@@ -16,26 +16,17 @@ namespace Raytracer
             public ARGBColor color;
             public Vector3D normal;
 
-            public static Intersection FarthestAway
-            {
-                get
-                {
-                    return new Intersection { value = Single.MaxValue };
-                }
-            }
+            public static readonly Intersection FarthestAway = new Intersection { value = Single.MaxValue };
 
-            public static Intersection None
-            {
-                get
+            public static readonly Intersection None = 
+                new Intersection
                 {
-                    return new Intersection
-                    {
-                        value = Single.NaN,
-                        color = (ARGBColor)0xDEADBEEF,
-                        normal = new Vector3D(Single.NaN, Single.NaN, Single.NaN)
-                    };
-                }
-            }
+                    value = Single.NaN,
+                    color = (ARGBColor)0xDEADBEEF,
+                    normal = new Vector3D(Single.NaN, Single.NaN, Single.NaN)
+                };
+
+            public static readonly Intersection[] NoneArray = { };
 
             public const float MinValue = (1 / 1024f);
 

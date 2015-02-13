@@ -39,12 +39,13 @@ namespace Raytracer
             }
 
             float value = ray.YEquation.SolveWhenValueIs(Y);
+            Point3D point = ray.PointAt(value);
             if (value >= Intersection.MinValue)
             {
                 return new Intersection
                 {
                     value = value,
-                    color = ColorAt(ray.PointAt(value).X, ray.PointAt(value).Z),
+                    color = ColorAt(point.X, point.Z),
                     normal = YPlane.Normal
                 };
             }

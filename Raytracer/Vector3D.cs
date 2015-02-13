@@ -81,6 +81,8 @@ namespace Raytracer
 
         public void Rotate(float rotationXZ, float rotationYZ)
         {
+            //todo: optimize the heck out of this function
+
             if (rotationYZ != 0)
             {
                 //First do vertical
