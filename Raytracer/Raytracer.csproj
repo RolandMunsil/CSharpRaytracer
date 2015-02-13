@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{A971C333-7822-4130-9369-EF726C421EDE}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Raytracer</RootNamespace>
     <AssemblyName>Raytracer</AssemblyName>
@@ -31,11 +31,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
+    <Compile Include="Equations.cs" />
     <Compile Include="Renderables\CSGObject.cs" />
     <Compile Include="Renderables\Renderable.cs" />
     <Compile Include="Point3D.cs" />
@@ -44,6 +48,7 @@
     <Compile Include="Scene.cs" />
     <Compile Include="Renderables\Sphere.cs" />
     <Compile Include="Vector3D.cs" />
+    <Compile Include="YPlane.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PixelWindowCSharp">
@@ -52,6 +57,10 @@
     <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "C:\Users\Roland\Documents\Visual Studio 2013\Projects\PixelWindow\Release\PixelWindow.dll" "$(TargetDir)"
+copy /Y "C:\Users\Roland\Documents\Visual Studio 2013\Projects\PixelWindow\Release\PixelWindow.pdb" "$(TargetDir)"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
