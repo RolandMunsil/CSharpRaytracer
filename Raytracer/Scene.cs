@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PixelWindowCSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,7 +22,7 @@ namespace Raytracer
             public int imageWidth;
             public int imageHeight;
         }
-
+        public ARGBColor skyColor;
         public Renderable[] renderedObjects;
         public Camera camera;
         public RenderOptions options;

@@ -12,6 +12,7 @@ namespace Raytracer
     {
         static Scene scene = new Scene
             {
+                skyColor = (ARGBColor)0xFFB2FFFF,
                 renderedObjects = new Renderable[]
                 {
                     new Sphere(new Point3D(0, 0, 0), 40)
@@ -40,10 +41,7 @@ namespace Raytracer
                     imageWidth = 1600,
                     imageHeight = 900
                 }
-
             };
-
-        static ARGBColor skyColor = (ARGBColor)0xFFB2FFFF;
 
         public static void Main(string[] args)
         {
@@ -109,7 +107,7 @@ namespace Raytracer
             if(hitObj == null)
             {
                 //No hit
-                return skyColor;
+                return scene.skyColor;
             }
 
             //TODO: would using a float for each channel have a significant effect? Probably not, but maybe?
