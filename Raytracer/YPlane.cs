@@ -57,7 +57,15 @@ namespace Raytracer
 
         public override Intersection[] GetAllIntersections(Ray ray)
         {
-            return new[] { GetNearestIntersection(ray) };
+            Intersection i = GetNearestIntersection(ray);
+            if (i == Intersection.None)
+            {
+                return Intersection.NoneArray;
+            }
+            else
+            {
+                return new[] { i };
+            }
         }
 
         public override bool Contains(Point3D point)

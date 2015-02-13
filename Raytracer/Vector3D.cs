@@ -33,18 +33,27 @@ namespace Raytracer
             }
         }
 
-        /// <summary>
-        /// Some example values:
-        /// if the vector points directly +y, this will return π/2
-        /// if the vector points directly +z, this will return 0
-        /// if the vector points directly -y, this will return -π/2,
-        /// etc.
-        /// </summary>
-        public float AngleYZ
+        ///// <summary>
+        ///// Some example values:
+        ///// if the vector points directly +y, this will return π/2
+        ///// if the vector points directly +z, this will return 0
+        ///// if the vector points directly -y, this will return -π/2,
+        ///// etc.
+        ///// </summary>
+        //public float AngleYZ
+        //{
+        //    get
+        //    {
+        //        return (float)Math.Atan2(Y, Z);
+        //    }
+        //}
+
+        public float AngleFromHorizontalPlane
         {
             get
             {
-                return (float)Math.Atan2(Y, Z);
+                Vector3D onVerticalPlane = this.Rotated(-AngleXZ, 0);
+                return (float)Math.Atan2(onVerticalPlane.Y, onVerticalPlane.Z);
             }
         }
 
@@ -104,6 +113,15 @@ namespace Raytracer
                 this.X = (float)Math.Sin(newAngle) * lengthXZ;
                 this.Z = (float)Math.Cos(newAngle) * lengthXZ;
             }
+        }
+
+        public Vector3D Rotated(float rotationXZ, float rotationYZ)
+        {
+            //todo: optimize the heck out of this function
+
+            Vector3D copy = this;
+            copy.Rotate(rotationXZ, rotationYZ);
+            return copy;
         }
 
         public Vector3D Reflected(Vector3D surfaceNormal)

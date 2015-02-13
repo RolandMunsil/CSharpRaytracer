@@ -32,7 +32,7 @@ namespace Raytracer
             this.position = position;
             Vector3D direction = lookingAt - position;
             facingAngleHoriz = direction.AngleXZ;
-            facingAngleVert = direction.AngleYZ;
+            facingAngleVert = direction.AngleFromHorizontalPlane;
 
             this.projection = projection;
         }

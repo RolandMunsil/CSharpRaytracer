@@ -122,7 +122,7 @@ namespace Raytracer
 
         public override bool Contains(Point3D point)
         {
-            return (point - center).LengthSquared <= radius;
+            return (point - center).LengthSquared <= radius * radius;
         }
     }
 }
