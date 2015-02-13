@@ -12,17 +12,17 @@ namespace Raytracer
         Point3D center;
         float radius;
 
-        ARGBColor color;
+        public ARGBColor color;
 
         public Sphere(Point3D center, float radius)
         {
             this.center = center;
             this.radius = radius;
 
-            reflectionAmount = .6f;
-            refractionAmount = 0;
-            refractionIndex = 0;
-            color = (ARGBColor)0xFF91D9D1;
+            //reflectionAmount = .6f;
+            //refractionAmount = 0;
+            //refractionIndex = 0;
+            //color = (ARGBColor)0xFF91D9D1;
         }
 
         public override Intersection GetNearestIntersection(Ray ray)

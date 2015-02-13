@@ -14,37 +14,78 @@ namespace Raytracer
             {
                 renderedObjects = new Renderable[]
                 {
-                    new Sphere(new Point3D(0, 0, 150), 40),
-                    new YPlane(-50)
+                    new Sphere(new Point3D(0, 0, 0), 40)
+                    {
+                        reflectionAmount = .6f,
+                        color = (ARGBColor)0xFF91D9D1
+                    },
+                    new YPlane(-40)
+                    {
+                        reflectionAmount = .3f,
+                    }
                 },
-                camera = new Camera(Point3D.Zero, new Point3D(0, 0, 1),Camera.Projection.Perspective, 700, 1),
+                camera = new Camera(new Point3D(75, 75, -75), new Point3D(0, 10, 0), Camera.Projection.Perspective)
+                {
+                    //put them here instead of in the constructor for clarity
+                    focalLength = 700,
+                    zoom = 1
+                },
                 options = new Scene.RenderOptions
                 {
-                    antialiasAmount = 1,
+                    antialiasAmount = 2,
                     lightingEnabled = false,
                     maxReflections = 10,
-                    maxRefractions = 10
+                    maxRefractions = 10,
+
+                    imageWidth = 1600,
+                    imageHeight = 900
                 }
 
             };
+
         static ARGBColor skyColor = (ARGBColor)0xFFB2FFFF;
 
         public static void Main(string[] args)
         {
-            using (PixelWindow window = new PixelWindow(1600, 900, "Raytracing"))
+            using (PixelWindow window = new PixelWindow(scene.options.imageWidth, scene.options.imageHeight, "Raytracing"))
             {
                 //TODO: multithreading (Parallel.ForEach?)
                 for (int x = 0; x < window.ClientWidth; x++)
                 {
                     for (int y = 0; y < window.ClientHeight; y++)
                     {
-                        Ray ray = scene.camera.RayAtPixel(x, y, window);
+                        int rSum = 0;
+                        int gSum = 0;
+                        int bSum = 0;
 
-                        ARGBColor color = ColorOf(ray, scene.options.maxReflections, scene.options.maxRefractions);
-                        window[x, y] = color;
+                        //Antialiasing
+                        for (int subX = 0; subX < scene.options.antialiasAmount; subX++)
+                        {
+                            for (int subY = 0; subY < scene.options.antialiasAmount; subY++)
+                            {
+                                Ray ray = scene.camera.RayAtPixel(x + (subX / (float)scene.options.antialiasAmount), y + (subY / (float)scene.options.antialiasAmount), window);
+
+                                ARGBColor color = ColorOf(ray, scene.options.maxReflections, scene.options.maxRefractions);
+                                rSum += color.red;
+                                gSum += color.green;
+                                bSum += color.blue;
+                            }
+                        }
+                        window[x, y] = new ARGBColor
+                        {
+                            red = (byte)(rSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
+                            green = (byte)(gSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
+                            blue = (byte)(bSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
+                            reserved = 0
+                        };
+                        
                     }
-                    window.UpdateClient();
+                    if (x % (256) == 0)
+                    {
+                        window.UpdateClient();
+                    }
                 }
+                window.UpdateClient();
 
                 while (!window.IsClosed) ;
             }

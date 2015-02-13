@@ -24,10 +24,10 @@ namespace Raytracer
         Projection projection;
 
         //todo: figure out more about this. size, camera as plane, camera as point, etc.
-        float focalLength;
-        float zoom;
+        public float focalLength;
+        public float zoom;
 
-        public Camera(Point3D position, Point3D lookingAt, Projection projection, float focalLength, float zoom)
+        public Camera(Point3D position, Point3D lookingAt, Projection projection)
         {
             this.position = position;
             Vector3D direction = lookingAt - position;
@@ -35,11 +35,9 @@ namespace Raytracer
             facingAngleVert = direction.AngleYZ;
 
             this.projection = projection;
-            this.focalLength = focalLength;
-            this.zoom = zoom;
         }
 
-        public Ray RayAtPixel(int x, int y, PixelWindow window)
+        public Ray RayAtPixel(float x, float y, PixelWindow window)
         {
             float sortaFov = 1 / focalLength;
             float adjX = x - (window.ClientWidth / 2f);
