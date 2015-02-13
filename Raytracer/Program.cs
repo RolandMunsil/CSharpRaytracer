@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PixelWindowCSharp;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Raytracer
 {
@@ -33,7 +34,7 @@ namespace Raytracer
                 },
                 options = new Scene.RenderOptions
                 {
-                    antialiasAmount = 2,
+                    antialiasAmount = 4,
                     lightingEnabled = false,
                     maxReflections = 10,
                     maxRefractions = 10,
@@ -47,11 +48,17 @@ namespace Raytracer
         {
             using (PixelWindow window = new PixelWindow(scene.options.imageWidth, scene.options.imageHeight, "Raytracing"))
             {
-                //TODO: multithreading (Parallel.ForEach?)
-                for (int x = 0; x < window.ClientWidth; x++)
+                int updateCount = 0;
+
+                Parallel.For(0, window.ClientWidth, delegate(int x)
                 {
-                    for (int y = 0; y < window.ClientHeight; y++)
+
+                    //for (int x = 0; x < window.ClientWidth; x++)
+                    //{
+                    Parallel.For(0, window.ClientHeight, delegate(int y)
                     {
+                        //for (int y = 0; y < window.ClientHeight; y++)
+                        //{
                         int rSum = 0;
                         int gSum = 0;
                         int bSum = 0;
@@ -69,20 +76,30 @@ namespace Raytracer
                                 bSum += color.blue;
                             }
                         }
-                        window[x, y] = new ARGBColor
+                        lock (window)
                         {
-                            red = (byte)(rSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
-                            green = (byte)(gSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
-                            blue = (byte)(bSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
-                            reserved = 0
-                        };
+                            window[x, y] = new ARGBColor
+                            {
+                                red = (byte)(rSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
+                                green = (byte)(gSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
+                                blue = (byte)(bSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
+                                reserved = 0
+                            };
+                            //window.UpdateClient();
+                        }
                         
-                    }
-                    if (x % (256) == 0)
+
+                    });
+
+                    //I realize the increment isn't thread safe but I figure it's not that important that it is.
+                    if (++updateCount % 16 == 0)
                     {
-                        window.UpdateClient();
+                        lock (window)
+                        {
+                            window.UpdateClient();
+                        }
                     }
-                }
+                });
                 window.UpdateClient();
 
                 while (!window.IsClosed) ;
