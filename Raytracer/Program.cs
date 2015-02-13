@@ -11,22 +11,34 @@ namespace Raytracer
 {
     static class Program
     {
+        static Sphere middleSphere = new Sphere(new Point3D(0, 0, 0), 40)
+        {
+            reflectionAmount = .6f,
+            color = (ARGBColor)0xFF91D9D1
+        };
+        static Sphere cutoutSphere = new Sphere(new Point3D(0, 0, -40), 30)
+        {
+            reflectionAmount = .6f,
+            color = (ARGBColor)0xFF910000
+        };
+
         static Scene scene = new Scene
             {
                 skyColor = (ARGBColor)0xFFB2FFFF,
                 renderedObjects = new Renderable[]
                 {
-                    new Sphere(new Point3D(0, 0, 0), 40)
-                    {
-                        reflectionAmount = .6f,
-                        color = (ARGBColor)0xFF91D9D1
-                    },
+                    //new Sphere(new Point3D(0, 0, 0), 40)
+                    //{
+                    //    reflectionAmount = .6f,
+                    //    color = (ARGBColor)0xFF91D9D1
+                    //},
+                    middleSphere - cutoutSphere,
                     new YPlane(-40)
                     {
                         reflectionAmount = .3f,
                     }
                 },
-                camera = new Camera(new Point3D(75, 75, -75), new Point3D(0, 10, 0), Camera.Projection.Perspective)
+                camera = new Camera(new Point3D(75, 75, -75), new Point3D(0, 0, 0), Camera.Projection.Perspective)
                 {
                     //put them here instead of in the constructor for clarity
                     focalLength = 700,
@@ -39,8 +51,8 @@ namespace Raytracer
                     maxReflections = 10,
                     maxRefractions = 10,
 
-                    imageWidth = 1600,
-                    imageHeight = 900
+                    imageWidth = 700,
+                    imageHeight = 700
                 }
             };
 
@@ -52,7 +64,6 @@ namespace Raytracer
 
                 Parallel.For(0, window.ClientWidth, delegate(int x)
                 {
-
                     //for (int x = 0; x < window.ClientWidth; x++)
                     //{
                     Parallel.For(0, window.ClientHeight, delegate(int y)
@@ -76,18 +87,19 @@ namespace Raytracer
                                 bSum += color.blue;
                             }
                         }
+                        ARGBColor combined = new ARGBColor
+                        {
+                            red = (byte)(rSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
+                            green = (byte)(gSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
+                            blue = (byte)(bSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
+                            reserved = 0
+                        };
                         lock (window)
                         {
-                            window[x, y] = new ARGBColor
-                            {
-                                red = (byte)(rSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
-                                green = (byte)(gSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
-                                blue = (byte)(bSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
-                                reserved = 0
-                            };
+                            window[x, y] = combined;
                             //window.UpdateClient();
                         }
-                        
+
 
                     });
 
@@ -104,7 +116,6 @@ namespace Raytracer
 
                 while (!window.IsClosed) ;
             }
-            
         }
 
         static ARGBColor ColorOf(Ray ray, int reflectionsLeft, int refractionsLeft)

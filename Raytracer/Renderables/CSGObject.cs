@@ -8,7 +8,7 @@ namespace Raytracer
 {
     class CSGObject : Renderable
     {
-        enum Operation
+        public enum Operation
         {
             OuterShellOnly,
             And,
@@ -19,6 +19,17 @@ namespace Raytracer
         Renderable renderable1;
         Renderable renderable2;
         Operation operation;
+
+        public CSGObject(Renderable obj1, Renderable obj2, Operation operation)
+        {
+            this.renderable1 = obj1;
+            this.renderable2 = obj2;
+            this.operation = operation;
+
+            this.reflectionAmount = obj1.reflectionAmount;
+            this.refractionAmount = obj1.refractionAmount;
+            this.refractionIndex = obj1.refractionIndex;
+        }
 
         public override Intersection GetNearestIntersection(Ray ray)
         {
@@ -54,14 +65,6 @@ namespace Raytracer
                     break;
             }
 
-            Intersection minIntersection = validIntersections[0];
-            for (int i = 1; i < validIntersections.Count; i++)
-            {
-                if (validIntersections[i].value < minIntersection.value)
-                {
-                    minIntersection = validIntersections[i];
-                }
-            }
             return validIntersections.ToArray().Nearest();
         }
 
