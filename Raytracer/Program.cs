@@ -51,8 +51,8 @@ namespace Raytracer
                     maxReflections = 10,
                     maxRefractions = 10,
 
-                    imageWidth = 700,
-                    imageHeight = 700
+                    imageWidth = 1600,
+                    imageHeight = 900
                 }
             };
 
@@ -73,7 +73,9 @@ namespace Raytracer
                         int rSum = 0;
                         int gSum = 0;
                         int bSum = 0;
+                        //long totalColorCalcTime = 0;
 
+                        //Stopwatch stopWatch = new Stopwatch();
                         //Antialiasing
                         for (int subX = 0; subX < scene.options.antialiasAmount; subX++)
                         {
@@ -81,12 +83,18 @@ namespace Raytracer
                             {
                                 Ray ray = scene.camera.RayAtPixel(x + (subX / (float)scene.options.antialiasAmount), y + (subY / (float)scene.options.antialiasAmount), window);
 
+                                //stopWatch.Restart();
                                 ARGBColor color = ColorOf(ray, scene.options.maxReflections, scene.options.maxRefractions);
+                                //stopWatch.Stop();
+                                //checked { totalColorCalcTime += stopWatch.ElapsedTicks; }
                                 rSum += color.red;
                                 gSum += color.green;
                                 bSum += color.blue;
                             }
                         }
+
+                        //long avgTime = (totalColorCalcTime * 2 / (scene.options.antialiasAmount * scene.options.antialiasAmount));
+
                         ARGBColor combined = new ARGBColor
                         {
                             red = (byte)(rSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
@@ -94,6 +102,12 @@ namespace Raytracer
                             blue = (byte)(bSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
                             reserved = 0
                         };
+                        //{
+                        //    red = (byte)avgTime,
+                        //    green = (byte)avgTime,
+                        //    blue = (byte)avgTime
+                        //};
+
                         lock (window)
                         {
                             window[x, y] = combined;
@@ -104,7 +118,7 @@ namespace Raytracer
                     });
 
                     //I realize the increment isn't thread safe but I figure it's not that important that it is.
-                    if (++updateCount % 16 == 0)
+                    if (++updateCount % 32 == 0)
                     {
                         lock (window)
                         {
@@ -173,15 +187,15 @@ namespace Raytracer
             return Math.Min((byte)0xFF, (byte)((diffuse * obj.DiffuseAmount) + (refracted * obj.reflectionAmount) + (reflected * obj.refractionAmount)));
         }
 
-        public static Renderable.Intersection Nearest(this Renderable.Intersection[] intersections)
+        public static Renderable.Intersection Nearest(this IList<Renderable.Intersection> intersections)
         {
-            if (intersections.Length < 3)
+            if (intersections.Count < 3)
             {
-                if (intersections.Length == 1)
+                if (intersections.Count == 1)
                 {
                     return intersections[0];
                 }
-                if (intersections.Length == 2)
+                if (intersections.Count == 2)
                 {
                     return intersections[0].value < intersections[1].value ? intersections[0] : intersections[1];
                 }

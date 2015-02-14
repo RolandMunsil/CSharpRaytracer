@@ -36,36 +36,166 @@ namespace Raytracer
             Intersection[] obj1Intersections = renderable1.GetAllIntersections(ray);
             Intersection[] obj2Intersections = renderable2.GetAllIntersections(ray);
 
-            List<Intersection> validIntersections = new List<Intersection>(obj1Intersections.Length + obj2Intersections.Length);
+            if (obj1Intersections.Length == 0 && obj2Intersections.Length == 0)
+            {
+                return Intersection.None;
+            }
 
-            //TODO: there are lotsa ways this can be optimized. Right now it's just written to be short and clear.
+            //List<Intersection> validIntersections = new List<Intersection>(obj1Intersections.Length + obj2Intersections.Length);
+
+            Intersection closest = Intersection.FarthestAway;
+            //TODO: a lot of this code is very similar - is there a way to put it in a helper function without significantly impacting performance?
             switch (operation)
             {
                 case Operation.OuterShellOnly:
                     //Don't add points that are inside the other renderable
-                    validIntersections.AddRange(obj1Intersections.Where(i => !renderable2.Contains(ray.PointAt(i.value))));
-                    validIntersections.AddRange(obj2Intersections.Where(i => !renderable1.Contains(ray.PointAt(i.value))));
+
+                    //If the only intersections are with the 1st object, we don't need to check contains or anything
+                    if (obj1Intersections.Length == 0)
+                    {
+                        return obj2Intersections.Nearest();
+                    }
+                    //If the only intersections are with the 2nd object, we don't need to check contains or anything
+                    if (obj2Intersections.Length == 0)
+                    {
+                        return obj1Intersections.Nearest();
+                    }
+
+                    foreach(Intersection intersection in obj1Intersections)
+                    {
+                        if (intersection.value < closest.value)
+                        {
+                            Point3D intersectionPoint = ray.PointAt(intersection.value);
+                            if (!renderable2.Contains(intersectionPoint))
+                            {
+                                closest = intersection;
+                            }
+                        }
+                    }
+
+                    foreach (Intersection intersection in obj2Intersections)
+                    {
+                        if (intersection.value < closest.value)
+                        {
+                            Point3D intersectionPoint = ray.PointAt(intersection.value);
+                            if (!renderable1.Contains(intersectionPoint))
+                            {
+                                closest = intersection;
+                            }
+                        }
+                    }
                     break;
                 case Operation.And:
                     //Only add points that are inside the other renderable
-                    validIntersections.AddRange(obj1Intersections.Where(i => renderable2.Contains(ray.PointAt(i.value))));
-                    validIntersections.AddRange(obj2Intersections.Where(i => renderable1.Contains(ray.PointAt(i.value))));
+
+                    //If the ray only passes through one object, there can't be any intersection.
+                    if (obj1Intersections.Length == 0 || obj2Intersections.Length == 0)
+                    {
+                        return Intersection.None;
+                    }
+
+                    foreach(Intersection intersection in obj1Intersections)
+                    {
+                        if (intersection.value < closest.value)
+                        {
+                            Point3D intersectionPoint = ray.PointAt(intersection.value);
+                            if (renderable2.Contains(intersectionPoint))
+                            {
+                                closest = intersection;
+                            }
+                        }
+                    }
+
+                    foreach (Intersection intersection in obj2Intersections)
+                    {
+                        if (intersection.value < closest.value)
+                        {
+                            Point3D intersectionPoint = ray.PointAt(intersection.value);
+                            if (renderable1.Contains(intersectionPoint))
+                            {
+                                closest = intersection;
+                            }
+                        }
+                    }
                     break;
                 case Operation.ExclusiveOr:
                     //All points are valid
-                    validIntersections.AddRange(obj1Intersections);
-                    validIntersections.AddRange(obj2Intersections);
+
+                    //If the only intersections are with the 1st object, we don't need to check contains or anything
+                    if (obj1Intersections.Length == 0)
+                    {
+                        return obj2Intersections.Nearest();
+                    }
+                    //If the only intersections are with the 2nd object, we don't need to check contains or anything
+                    if (obj2Intersections.Length == 0)
+                    {
+                        return obj1Intersections.Nearest();
+                    }
+
+                    foreach (Intersection intersection in obj1Intersections)
+                    {
+                        if (intersection.value < closest.value)
+                        {
+                            closest = intersection;
+                        }
+                    }
+
+                    foreach (Intersection intersection in obj2Intersections)
+                    {
+                        if (intersection.value < closest.value)
+                        {
+                            closest = intersection;
+                        }
+                    }
                     break;
                 case Operation.FirstWithoutSecond:
                     //Only add points that are either:
                     //  On the surface of the first and not inside the second
                     //  On the surface of the second and inside the first
-                    validIntersections.AddRange(obj1Intersections.Where(i => !renderable2.Contains(ray.PointAt(i.value))));
-                    validIntersections.AddRange(obj2Intersections.Where(i => renderable1.Contains(ray.PointAt(i.value))));
+
+                    //If the ray does not pass through the first object, none of the points could possibly be inside of it
+                    if (obj1Intersections.Length == 0)
+                    {
+                        return Intersection.None;
+                    }
+                    //If the only intersections are with the 1st object, we don't need to check contains or anything
+                    else if (obj2Intersections.Length == 0)
+                    {
+                        return obj1Intersections.Nearest();
+                    }
+
+                    foreach(Intersection intersection in obj1Intersections)
+                    {
+                        if (intersection.value < closest.value)
+                        {
+                            Point3D intersectionPoint = ray.PointAt(intersection.value);
+                            if (!renderable2.Contains(intersectionPoint))
+                            {
+                                closest = intersection;
+                            }
+                        }
+                    }
+
+                    foreach (Intersection intersection in obj2Intersections)
+                    {
+                        if (intersection.value < closest.value)
+                        {
+                            Point3D intersectionPoint = ray.PointAt(intersection.value);
+                            if (renderable1.Contains(intersectionPoint))
+                            {
+                                closest = intersection;
+                            }
+                        }
+                    }
                     break;
             }
 
-            return validIntersections.ToArray().Nearest();
+            //return validIntersections.ToArray().Nearest();
+            if(closest == Intersection.FarthestAway)
+            {
+                return Intersection.None;
+            }
+            return closest;
         }
 
         public override Renderable.Intersection[] GetAllIntersections(Ray ray)

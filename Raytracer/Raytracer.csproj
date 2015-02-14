@@ -55,6 +55,7 @@
       <HintPath>..\..\PixelWindow\Release\PixelWindowCSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
