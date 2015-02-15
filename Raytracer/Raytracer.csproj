@@ -48,7 +48,7 @@
     <Compile Include="Scene.cs" />
     <Compile Include="Renderables\Sphere.cs" />
     <Compile Include="Vector3D.cs" />
-    <Compile Include="YPlane.cs" />
+    <Compile Include="Renderables\YPlane.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PixelWindowCSharp">
