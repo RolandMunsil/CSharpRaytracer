@@ -36,7 +36,7 @@ namespace Raytracer
             }
             public static bool operator !=(Intersection intersection1, Intersection intersection2)
             {
-                return !(intersection1 == intersection2);
+                return intersection1.value != intersection2.value || intersection1.color != intersection2.color || intersection1.normal != intersection2.normal;
             }
             public override int GetHashCode()
             {
