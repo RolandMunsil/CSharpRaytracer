@@ -40,6 +40,7 @@
   <ItemGroup>
     <Compile Include="Camera.cs" />
     <Compile Include="Equations.cs" />
+    <Compile Include="LightSource.cs" />
     <Compile Include="Renderables\CSGObject.cs" />
     <Compile Include="Renderables\Renderable.cs" />
     <Compile Include="Point3D.cs" />

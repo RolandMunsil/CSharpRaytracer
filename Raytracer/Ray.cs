@@ -27,6 +27,11 @@ namespace Raytracer
             ZEquation = new LinearEquation(direction.Z, origin.Z);
         }
 
+        public Ray(Point3D origin, Point3D endPoint)
+            : this(origin, endPoint - origin)
+        {
+        }
+
         public Point3D PointAt(float t)
         {
             return new Point3D(XEquation.ValueAt(t), YEquation.ValueAt(t), ZEquation.ValueAt(t));

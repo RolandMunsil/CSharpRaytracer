@@ -17,6 +17,7 @@ namespace Raytracer
         {
             public int antialiasAmount;
             public bool lightingEnabled;
+            public float ambientLight;
             public int maxReflections;
             public int maxRefractions;
             public int imageWidth;
@@ -24,6 +25,7 @@ namespace Raytracer
         }
         public ARGBColor skyColor;
         public Renderable[] renderedObjects;
+        public LightSource[] lightSources;
         public Camera camera;
         public RenderOptions options;
 

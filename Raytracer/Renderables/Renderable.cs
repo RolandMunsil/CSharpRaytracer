@@ -28,7 +28,7 @@ namespace Raytracer
 
             public static readonly Intersection[] NoneArray = { };
 
-            public const float MinValue = (1 / 1024f);
+            public const float MinValue = (1 / 2048f);
 
             public static bool operator ==(Intersection intersection1, Intersection intersection2)
             {
