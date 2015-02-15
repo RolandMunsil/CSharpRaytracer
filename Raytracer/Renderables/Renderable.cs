@@ -56,14 +56,14 @@ namespace Raytracer
             }
         }
 
-        public float refractionAmount = 0;
-        public float reflectionAmount = 0;
+        public float refractivity = 0;
+        public float reflectivity = 0;
         public float refractionIndex = 0;
         public float DiffuseAmount
         {
             get
             {
-                return 1 - (refractionAmount + reflectionAmount);
+                return 1 - (refractivity + reflectivity);
             }
         }
 

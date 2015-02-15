@@ -13,12 +13,12 @@ namespace Raytracer
     {
         static Sphere middleSphere = new Sphere(new Point3D(0, 0, 0), 40)
         {
-            reflectionAmount = .6f,
+            reflectivity = .6f,
             color = (ARGBColor)0xFF91D9D1
         };
         static Sphere cutoutSphere = new Sphere(new Point3D(0, 0, -40), 30)
         {
-            reflectionAmount = .6f,
+            reflectivity = .6f,
             color = (ARGBColor)0xFF910000
         };
 
@@ -35,7 +35,7 @@ namespace Raytracer
                     middleSphere - cutoutSphere,
                     new YPlane(-40)
                     {
-                        reflectionAmount = .3f,
+                        reflectivity = .3f,
                     }
                 },
                 camera = new Camera(new Point3D(75, 75, -75), new Point3D(0, 0, 0), Camera.Projection.Perspective)
@@ -157,14 +157,14 @@ namespace Raytracer
             ARGBColor reflectedColor = (ARGBColor)0x00000000;
             ARGBColor refractedColor = (ARGBColor)0x00000000;
 
-            if (reflectionsLeft > 0 && hitObj.reflectionAmount > 0)
+            if (reflectionsLeft > 0 && hitObj.reflectivity > 0)
             {
                 Vector3D reflectedVector = ray.ToVector3D().Reflected(closestIntersection.normal);
                 Ray reflectedRay = new Ray(ray.PointAt(closestIntersection.value), reflectedVector);
                 reflectedColor = ColorOf(reflectedRay, --reflectionsLeft, refractionsLeft);
 
             }
-            if (refractionsLeft > 0 && hitObj.refractionAmount > 0)
+            if (refractionsLeft > 0 && hitObj.refractivity > 0)
             {
                 //TODO: figure out way to track whether ray is indside or outside, refraction indexes, etc.
 
@@ -184,7 +184,7 @@ namespace Raytracer
 
         static byte CombineChannels(byte diffuse, byte refracted, byte reflected, Renderable obj)
         {
-            return Math.Min((byte)0xFF, (byte)((diffuse * obj.DiffuseAmount) + (refracted * obj.reflectionAmount) + (reflected * obj.refractionAmount)));
+            return Math.Min((byte)0xFF, (byte)((diffuse * obj.DiffuseAmount) + (refracted * obj.reflectivity) + (reflected * obj.refractivity)));
         }
 
         public static Renderable.Intersection Nearest(this IList<Renderable.Intersection> intersections)

@@ -15,8 +15,8 @@ namespace Raytracer
         public YPlane(float y)
         {
             this.Y = y;
-            this.reflectionAmount = 0;
-            this.refractionAmount = 0;
+            this.reflectivity = 0;
+            this.refractivity = 0;
         }
 
         public override Intersection GetNearestIntersection(Ray ray)

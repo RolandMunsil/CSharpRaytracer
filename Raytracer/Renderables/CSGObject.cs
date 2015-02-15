@@ -26,8 +26,8 @@ namespace Raytracer
             this.renderable2 = obj2;
             this.operation = operation;
 
-            this.reflectionAmount = obj1.reflectionAmount;
-            this.refractionAmount = obj1.refractionAmount;
+            this.reflectivity = obj1.reflectivity;
+            this.refractivity = obj1.refractivity;
             this.refractionIndex = obj1.refractionIndex;
         }
 
