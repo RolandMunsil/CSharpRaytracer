@@ -69,22 +69,47 @@ namespace Raytracer
         {
             using (PixelWindow window = new PixelWindow(scene.options.imageWidth, scene.options.imageHeight, "Raytracing"))
             {
+                //for (int frame = 1; frame < 32; frame++)
+                //{
+                //double angle = (frame / (double)240) * (Math.PI * 2);
+                //scene.camera = new Camera(new Point3D(107 * (float)Math.Sin(angle), 75, 107 * (float)Math.Cos(angle)), new Point3D(0, 0, 0), Camera.Projection.Perspective)
+                //{
+                //    //put them here instead of in the constructor for clarity
+                //    focalLength = 700,
+                //    zoom = 1
+                //};
+
                 int updateCount = 0;
 
-                Parallel.For(0, window.ClientWidth, delegate(int x)
+                //Stopwatch sw = new Stopwatch();
+                //sw.Start();
+
+                Parallel.For(0, window.ClientWidth, delegate(int x, ParallelLoopState xState)
                 {
                 //for (int x = 0; x < window.ClientWidth; x++)
                 //{
-                    Parallel.For(0, window.ClientHeight, delegate(int y)
+                    if (window.IsClosed)
+                    {
+                        xState.Stop();
+                    }
+
+                    Parallel.For(0, window.ClientHeight, delegate(int y, ParallelLoopState yState)
                     {
                     //for (int y = 0; y < window.ClientHeight; y++)
                     //{
+                        if (window.IsClosed)
+                        {
+                            yState.Stop();
+                        }
+
+                            
                         int rSum = 0;
                         int gSum = 0;
                         int bSum = 0;
-                        //long totalColorCalcTime = 0;
 
+                        //long totalColorCalcTime = 0;
                         //Stopwatch stopWatch = new Stopwatch();
+
                         //Antialiasing
                         for (int subX = 0; subX < scene.options.antialiasAmount; subX++)
                         {
@@ -117,11 +142,7 @@ namespace Raytracer
                         //    blue = (byte)avgTime
                         //};
 
-                        lock (window)
-                        {
-                            window[x, y] = combined;
-                            //window.UpdateClient();
-                        }
+                        window[x, y] = combined;
 
 
                     });
@@ -131,10 +152,20 @@ namespace Raytracer
                     {
                         lock (window)
                         {
-                            window.UpdateClient();
+                            //Doing an if wont work because the window could be closed between the check and the call to UpdateClient.
+                            //TODO: better way to do this?
+                            try
+                            {
+                                window.UpdateClient();
+                            }
+                            catch (InvalidOperationException)
+                            {
+                                xState.Stop();
+                            }
                         }
                     }
                 });
+
                 window.UpdateClient();
 
                 while (!window.IsClosed) ;
