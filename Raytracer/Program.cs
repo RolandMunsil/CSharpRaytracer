@@ -152,16 +152,7 @@ namespace Raytracer
                     {
                         lock (window)
                         {
-                            //Doing an if wont work because the window could be closed between the check and the call to UpdateClient.
-                            //TODO: better way to do this?
-                            try
-                            {
-                                window.UpdateClient();
-                            }
-                            catch (InvalidOperationException)
-                            {
-                                xState.Stop();
-                            }
+                            window.UpdateClient();
                         }
                     }
                 });
