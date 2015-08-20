@@ -50,5 +50,14 @@ namespace Raytracer
             direction.Rotate(facingAngleHoriz, facingAngleVert);
             return new Ray(position, direction);
         }
+
+        //TODO: better name
+        public void ChangePositionAndLookingAt(Point3D newPosition, Point3D newLookingAt)
+        {
+            this.position = newPosition;
+            Vector3D direction = newLookingAt - newPosition;
+            facingAngleHoriz = direction.AngleXZ;
+            facingAngleVert = direction.AngleFromHorizontalPlane;
+        }
     }
 }

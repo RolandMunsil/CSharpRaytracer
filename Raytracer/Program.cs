@@ -13,8 +13,8 @@ namespace Raytracer
     {
         static Sphere middleSphere = new Sphere(new Point3D(0, 0, 0), 40)
         {
-            reflectivity = 0f,
-            refractivity = 1f,
+            reflectivity = 0.0f,
+            refractivity = 1.0f,
             refractionIndex = 1.3f,
             color = (ARGBColor)0xFF91D9D1
         };
@@ -56,7 +56,7 @@ namespace Raytracer
                 },
                 options = new Scene.RenderOptions
                 {
-                    antialiasAmount = 4,
+                    antialiasAmount = 1,
                     parallelRendering = true,
                     lightingEnabled = false,
                     ambientLight = 0.3f,
@@ -64,7 +64,15 @@ namespace Raytracer
                     maxRefractions = 10,
 
                     imageWidth = 1600,
-                    imageHeight = 900
+                    imageHeight = 900,
+
+                    //animationFunction = delegate(int frameCount)
+                    //{
+                    //    //scene.camera.position *= 0.95f;
+
+                    //    //Point3D newCameraPos = new Point3D(75 * (float)Math.Sin(frameCount / 20f), 75, -75 * (float)Math.Cos(frameCount / 20f));
+                    //    //scene.camera.ChangePositionAndLookingAt(newCameraPos, new Point3D(0, 0, 0));
+                    //}
                 }
             };
 
@@ -86,52 +94,58 @@ namespace Raytracer
                 //    zoom = 1
                 //};
 
-                int verticalLinesRendered = 0;
+                int frameCount = 0;
 
-                //Stopwatch sw = new Stopwatch();
-                //sw.Start();
-
-                if (scene.options.parallelRendering)
+                do
                 {
-                    Parallel.For(0, window.ClientWidth, delegate(int x, ParallelLoopState xState)
+                    if (scene.options.animationFunction != null)
                     {
-                        if (window.IsClosed)
-                            xState.Stop();
+                        scene.options.animationFunction(frameCount++);
+                    }
 
-                        for (int y = 0; y < window.ClientHeight; y++)
+                    int verticalLinesRendered = 0;
+                    if (scene.options.parallelRendering)
+                    {
+                        Parallel.For(0, window.ClientWidth, delegate(int x, ParallelLoopState xState)
                         {
-                            window[x, y] = CalculatePixelColor(x, y, window, cameraIsInsideObject);
-                        }
+                            if (window.IsClosed)
+                                xState.Stop();
 
-                        //I realize the increment isn't thread safe but I figure it's not that important that it is - these updates are purely to make the render less boring to watch
-                        if (++verticalLinesRendered % 16 == 0)
+                            for (int y = 0; y < window.ClientHeight; y++)
+                            {
+                                window[x, y] = CalculatePixelColor(x, y, window, cameraIsInsideObject);
+                            }
+
+                            //I realize the increment isn't thread safe but I figure it's not that important that it is - these updates are purely to make the render less boring to watch
+                            if (++verticalLinesRendered % 64 == 0)
+                            {
+                                lock (window)
+                                {
+                                    window.UpdateClient();
+                                }
+                            }
+                        });
+                    }
+                    else
+                    {
+                        for (int x = 0; x < window.ClientWidth; x++)
                         {
-                            lock (window)
+                            for (int y = 0; y < window.ClientHeight; y++)
+                            {
+                                window[x, y] = CalculatePixelColor(x, y, window, cameraIsInsideObject);
+                            }
+
+                            if (++verticalLinesRendered % 64 == 0)
                             {
                                 window.UpdateClient();
                             }
                         }
-                    });
-                }
-                else
-                {
-                    for (int x = 0; x < window.ClientWidth; x++)
-                    {
-                        for (int y = 0; y < window.ClientHeight; y++)
-                        {
-                            window[x, y] = CalculatePixelColor(x, y, window, cameraIsInsideObject);
-                        }
-
-                        if (++verticalLinesRendered % 16 == 0)
-                        {
-                            window.UpdateClient();
-                        }
                     }
-                }
 
-                window.UpdateClient();
+                    window.UpdateClient();
+                } while (scene.options.animationFunction != null);
 
-                while (!window.IsClosed) ;
+                while (!window.IsClosed);
             }
         }
 

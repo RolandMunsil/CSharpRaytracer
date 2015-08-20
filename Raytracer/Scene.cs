@@ -12,6 +12,11 @@ namespace Raytracer
     /// </summary>
     class Scene
     {
+        /// <summary>
+        /// A function that is called before every frame.
+        /// </summary>
+        public delegate void AnimationFunction(int frameCount);
+
         //Should these even be in a struct? I think maybe im overcomplicating things.
         public struct RenderOptions
         {
@@ -23,6 +28,7 @@ namespace Raytracer
             public int maxRefractions;
             public int imageWidth;
             public int imageHeight;
+            public AnimationFunction animationFunction;
         }
         public ARGBColor skyColor;
         public Renderable[] renderedObjects;
