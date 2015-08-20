@@ -13,14 +13,16 @@ namespace Raytracer
     {
         static Sphere middleSphere = new Sphere(new Point3D(0, 0, 0), 40)
         {
-            reflectivity = .6f,
+            reflectivity = 0f,
+            refractivity = 1f,
+            refractionIndex = 1.3f,
             color = (ARGBColor)0xFF91D9D1
         };
-        static Sphere cutoutSphere = new Sphere(new Point3D(0, 20, -20), 30)
-        {
-            reflectivity = .6f,
-            color = (ARGBColor)0xFF910000
-        };
+        //static Sphere cutoutSphere = new Sphere(new Point3D(0, 20, -20), 30)
+        //{
+        //    reflectivity = .6f,
+        //    color = (ARGBColor)0xFF910000
+        //};
 
         static Scene scene = new Scene
             {
@@ -32,8 +34,8 @@ namespace Raytracer
                     //    reflectionAmount = .6f,
                     //    color = (ARGBColor)0xFF91D9D1
                     //},
-                    middleSphere - cutoutSphere,
-                    new YPlane(-40)
+                    middleSphere,// - cutoutSphere,
+                    new YPlane(-50)
                     {
                         reflectivity = .3f,
                     }
@@ -46,7 +48,7 @@ namespace Raytracer
                         maxLitDistance = 300
                     }
                 },
-                camera = new Camera(new Point3D(75, 75, -75), new Point3D(0, 0, 0), Camera.Projection.Perspective)
+                camera = new Camera(new Point3D(0, 75, -75), new Point3D(0, 0, 0), Camera.Projection.Perspective)
                 {
                     //put them here instead of in the constructor for clarity
                     focalLength = 700,
@@ -55,7 +57,7 @@ namespace Raytracer
                 options = new Scene.RenderOptions
                 {
                     antialiasAmount = 4,
-                    lightingEnabled = true,
+                    lightingEnabled = false,
                     ambientLight = 0.3f,
                     maxReflections = 10,
                     maxRefractions = 10,
@@ -65,10 +67,14 @@ namespace Raytracer
                 }
             };
 
+        public static float airRefractIndex = 1f;
+
         public static void Main(string[] args)
         {
             using (PixelWindow window = new PixelWindow(scene.options.imageWidth, scene.options.imageHeight, "Raytracing"))
             {
+                bool cameraIsInsideObject = scene.renderedObjects.Any(obj => obj.Contains(scene.camera.position));
+
                 //for (int frame = 1; frame < 32; frame++)
                 //{
                 //double angle = (frame / (double)240) * (Math.PI * 2);
@@ -101,7 +107,6 @@ namespace Raytracer
                         {
                             yState.Stop();
                         }
-
                             
                         int rSum = 0;
                         int gSum = 0;
@@ -118,7 +123,7 @@ namespace Raytracer
                                 Ray ray = scene.camera.RayAtPixel(x + (subX / (float)scene.options.antialiasAmount), y + (subY / (float)scene.options.antialiasAmount), window);
 
                                 //stopWatch.Restart();
-                                ARGBColor color = ColorOf(ray, scene.options.maxReflections, scene.options.maxRefractions);
+                                ARGBColor color = ColorOf(ray, scene.options.maxReflections, scene.options.maxRefractions, cameraIsInsideObject);
                                 //stopWatch.Stop();
                                 //checked { totalColorCalcTime += stopWatch.ElapsedTicks; }
                                 rSum += color.red;
@@ -142,6 +147,8 @@ namespace Raytracer
                         //    blue = (byte)avgTime
                         //};
 
+
+
                         window[x, y] = combined;
 
 
@@ -163,7 +170,7 @@ namespace Raytracer
             }
         }
 
-        static ARGBColor ColorOf(Ray ray, int reflectionsLeft, int refractionsLeft)
+        static ARGBColor ColorOf(Ray ray, int reflectionsLeft, int refractionsLeft, bool rayIsInObject)
         {
             Renderable.Intersection closestIntersection = Renderable.Intersection.FarthestAway;
             Renderable hitObj = null;
@@ -204,6 +211,10 @@ namespace Raytracer
                     foreach (Renderable obj in scene.renderedObjects)
                     {
                         Renderable.Intersection intersection = obj.GetNearestIntersection(rayToLight);
+
+                        //float lightthingdfjadsfl = rayToLight.PointAt(intersection.value).AngleTo(rayToLight.ToVector3D());
+
+
                         if (intersection != Renderable.Intersection.None && intersection.value < 1)
                         {
                             lightIsBlocked = true;
@@ -245,16 +256,20 @@ namespace Raytracer
             {
                 Vector3D reflectedVector = ray.ToVector3D().Reflected(closestIntersection.normal);
                 Ray reflectedRay = new Ray(hitPoint, reflectedVector);
-                reflectedColor = ColorOf(reflectedRay, --reflectionsLeft, refractionsLeft);
+                reflectedColor = ColorOf(reflectedRay, --reflectionsLeft, refractionsLeft, rayIsInObject);
 
             }
             if (refractionsLeft > 0 && hitObj.refractivity > 0)
             {
                 //TODO: figure out way to track whether ray is indside or outside, refraction indexes, etc.
 
-                //Vector3D refractedVector = ray.ToVector3D().Refracted(closestIntersection.normal);
-                //Ray refractedRay = new Ray(hitPoint, refractedVector);
-                //refractedColor = ColorOf(refractedRay, reflectionsLeft, --refractionsLeft);
+                float refractIndexFrom = rayIsInObject ? hitObj.refractionIndex : airRefractIndex;
+                float refractIndexTo = rayIsInObject ? airRefractIndex : hitObj.refractionIndex;
+
+                bool totalInternalReflection;
+                Vector3D refractedVector = ray.ToVector3D().Refracted(closestIntersection.normal, refractIndexFrom, refractIndexTo, out totalInternalReflection);
+                Ray refractedRay = new Ray(hitPoint, refractedVector);
+                refractedColor = ColorOf(refractedRay, reflectionsLeft, --refractionsLeft, (!rayIsInObject) ^ totalInternalReflection);
             }
 
             return new ARGBColor

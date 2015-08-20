@@ -133,7 +133,7 @@ namespace Raytracer
             return this - dunno;
         }
         //http://en.wikipedia.org/wiki/Snell's_law#Vector_form
-        public Vector3D Refracted(Vector3D surfaceNormal, float refractIndexFrom, float refractIndexTo)
+        public Vector3D Refracted(Vector3D surfaceNormal, float refractIndexFrom, float refractIndexTo, out bool totalInternalReflection)
         {
             Vector3D negNormal = (-surfaceNormal).Normalized();
             Vector3D thisNormalized = this.Normalized();
@@ -150,6 +150,7 @@ namespace Raytracer
             if (otherSine > 1) //Total internal reflection
             {
                 //return new RefractionInfo(true, GetReflected(surfaceNormal));
+                totalInternalReflection = true;
                 return this.Reflected(surfaceNormal);
             }
             else
@@ -157,6 +158,7 @@ namespace Raytracer
                 float cos2 = (float)Math.Sqrt(1 - (otherSine * otherSine));
                 float nMult = (refractRatio * cos1) - cos2;
 
+                totalInternalReflection = false;
                 return (thisNormalized * refractRatio) + (surfaceNormal * nMult);
 
                 //return new RefractionInfo(false,
@@ -212,7 +214,7 @@ namespace Raytracer
 
         public static Vector3D operator -(Vector3D vector)
         {
-            return new Vector3D(-vector.X, -vector.Y, vector.Z);
+            return new Vector3D(-vector.X, -vector.Y, -vector.Z);
         }
 
         public override string ToString()
