@@ -75,7 +75,7 @@ namespace Raytracer
 
         public static CSGObject operator |(Renderable renderable1, Renderable renderable2)
         {
-            return new CSGObject(renderable1, renderable2, CSGObject.Operation.OuterShellOnly);
+            return new CSGObject(renderable1, renderable2, CSGObject.Operation.Or);
         }
         public static CSGObject operator &(Renderable renderable1, Renderable renderable2)
         {

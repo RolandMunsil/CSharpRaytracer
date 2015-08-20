@@ -10,7 +10,7 @@ namespace Raytracer
     {
         public enum Operation
         {
-            OuterShellOnly,
+            Or,
             And,
             ExclusiveOr,
             FirstWithoutSecond,
@@ -47,7 +47,7 @@ namespace Raytracer
             //TODO: a lot of this code is very similar - is there a way to put it in a helper function without significantly impacting performance?
             switch (operation)
             {
-                case Operation.OuterShellOnly:
+                case Operation.Or:
                     //Don't add points that are inside the other renderable
 
                     //If the only intersections are with the 1st object, we don't need to check contains or anything
