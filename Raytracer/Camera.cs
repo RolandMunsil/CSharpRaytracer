@@ -9,10 +9,9 @@ namespace Raytracer
 {
     class Camera
     {
-        //TODO: should the camera be like a plane or a point?
-
         public enum Projection
         {
+            //TODO: implement orthographic projection
             Orthographic,
             Perspective,
         }

@@ -185,14 +185,16 @@ namespace Raytracer
             if (cosθ1 <= 0)
             {
                 n = -n;
-                l = this.Normalized();
-
                 cosθ1 = DotProduct(-n, l);
             }
 
             float sinθ2 = (n1 / n2) * (float)Math.Sqrt(1 - (cosθ1 * cosθ1));
 
-            if (1 - (sinθ2 * sinθ2) < 0) { totalInternalReflection = true; return this.Reflected(surfaceNormal); }
+            if (1 - (sinθ2 * sinθ2) < 0) 
+            { 
+                totalInternalReflection = true; 
+                return this.Reflected(surfaceNormal); 
+            }
 
             float cosθ2 = (float)Math.Sqrt(1 - (sinθ2 * sinθ2));
             Vector3D vrefract = l * (n1 / n2) + n * ((n1 / n2) * cosθ1 - cosθ2);

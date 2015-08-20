@@ -75,8 +75,8 @@ namespace Raytracer
 
         private ARGBColor ColorAt(float x, float z)
         {
-            //return x.PMod(20) < 10 ^ z.PMod(20) < 10 ? (ARGBColor)0xFF4A7023 : (ARGBColor)0xFF78AB46;
-            return x.PMod(20) < 10 ^ z.PMod(20) < 10 ? (ARGBColor)0xFFFFFFFF : (ARGBColor)0xFF000000;
+            return x.PMod(20) < 10 ^ z.PMod(20) < 10 ? (ARGBColor)0xFF4A7023 : (ARGBColor)0xFF78AB46;
+            //return x.PMod(20) < 10 ^ z.PMod(20) < 10 ? (ARGBColor)0xFFFFFFFF : (ARGBColor)0xFF000000;
         }
     }
 }

@@ -37,7 +37,7 @@ namespace Raytracer
                     middleSphere,// - cutoutSphere,
                     new YPlane(-50)
                     {
-                        reflectivity = .3f,
+                        reflectivity = 0f,
                     }
                 },
                 lightSources = new LightSource[]
@@ -48,7 +48,7 @@ namespace Raytracer
                         maxLitDistance = 300
                     }
                 },
-                camera = new Camera(new Point3D(0, 75, -75), new Point3D(0, 0, 0), Camera.Projection.Perspective)
+                camera = new Camera(new Point3D(0, 80, -80), new Point3D(0, 0, 0), Camera.Projection.Perspective)
                 {
                     //put them here instead of in the constructor for clarity
                     focalLength = 700,
@@ -56,7 +56,7 @@ namespace Raytracer
                 },
                 options = new Scene.RenderOptions
                 {
-                    antialiasAmount = 1,
+                    antialiasAmount = 4,
                     parallelRendering = true,
                     lightingEnabled = false,
                     ambientLight = 0.3f,
@@ -68,9 +68,8 @@ namespace Raytracer
 
                     //animationFunction = delegate(int frameCount)
                     //{
-                    //    //scene.camera.position *= 0.95f;
-
-                    //    //Point3D newCameraPos = new Point3D(75 * (float)Math.Sin(frameCount / 20f), 75, -75 * (float)Math.Cos(frameCount / 20f));
+                    //    //middleSphere.refractionIndex += .01f;
+                    //    //Point3D newCameraPos = new Point3D(0, 30 + frameCount * 5, 0);
                     //    //scene.camera.ChangePositionAndLookingAt(newCameraPos, new Point3D(0, 0, 0));
                     //}
                 }

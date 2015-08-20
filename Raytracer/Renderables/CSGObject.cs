@@ -205,7 +205,19 @@ namespace Raytracer
 
         public override bool Contains(Point3D point)
         {
-            throw new NotImplementedException();
+            switch (operation)
+            {
+                case Operation.Or:
+                    return renderable1.Contains(point) || renderable2.Contains(point);
+                case Operation.And:
+                    return renderable1.Contains(point) && renderable2.Contains(point);
+                case Operation.ExclusiveOr:
+                    return renderable1.Contains(point) ^ renderable2.Contains(point);
+                case Operation.FirstWithoutSecond:
+                    return renderable1.Contains(point) && !renderable2.Contains(point);
+                default:
+                    throw new NotImplementedException("Contains not implemented for " + operation);
+            }
         }
     }
 }
