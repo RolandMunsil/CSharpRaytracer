@@ -57,6 +57,7 @@ namespace Raytracer
                 options = new Scene.RenderOptions
                 {
                     antialiasAmount = 4,
+                    parallelRendering = true,
                     lightingEnabled = false,
                     ambientLight = 0.3f,
                     maxReflections = 10,
@@ -85,89 +86,97 @@ namespace Raytracer
                 //    zoom = 1
                 //};
 
-                int updateCount = 0;
+                int verticalLinesRendered = 0;
 
                 //Stopwatch sw = new Stopwatch();
                 //sw.Start();
 
-                Parallel.For(0, window.ClientWidth, delegate(int x, ParallelLoopState xState)
+                if (scene.options.parallelRendering)
                 {
-                //for (int x = 0; x < window.ClientWidth; x++)
-                //{
-                    if (window.IsClosed)
+                    Parallel.For(0, window.ClientWidth, delegate(int x, ParallelLoopState xState)
                     {
-                        xState.Stop();
-                    }
-
-                    Parallel.For(0, window.ClientHeight, delegate(int y, ParallelLoopState yState)
-                    {
-                    //for (int y = 0; y < window.ClientHeight; y++)
-                    //{
                         if (window.IsClosed)
+                            xState.Stop();
+
+                        for (int y = 0; y < window.ClientHeight; y++)
                         {
-                            yState.Stop();
+                            window[x, y] = CalculatePixelColor(x, y, window, cameraIsInsideObject);
                         }
-                            
-                        int rSum = 0;
-                        int gSum = 0;
-                        int bSum = 0;
 
-                        //long totalColorCalcTime = 0;
-                        //Stopwatch stopWatch = new Stopwatch();
-
-                        //Antialiasing
-                        for (int subX = 0; subX < scene.options.antialiasAmount; subX++)
+                        //I realize the increment isn't thread safe but I figure it's not that important that it is - these updates are purely to make the render less boring to watch
+                        if (++verticalLinesRendered % 16 == 0)
                         {
-                            for (int subY = 0; subY < scene.options.antialiasAmount; subY++)
+                            lock (window)
                             {
-                                Ray ray = scene.camera.RayAtPixel(x + (subX / (float)scene.options.antialiasAmount), y + (subY / (float)scene.options.antialiasAmount), window);
-
-                                //stopWatch.Restart();
-                                ARGBColor color = ColorOf(ray, scene.options.maxReflections, scene.options.maxRefractions, cameraIsInsideObject);
-                                //stopWatch.Stop();
-                                //checked { totalColorCalcTime += stopWatch.ElapsedTicks; }
-                                rSum += color.red;
-                                gSum += color.green;
-                                bSum += color.blue;
+                                window.UpdateClient();
                             }
                         }
-
-                        //long avgTime = (totalColorCalcTime * 2 / (scene.options.antialiasAmount * scene.options.antialiasAmount));
-
-                        ARGBColor combined = new ARGBColor
-                        {
-                            red = (byte)(rSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
-                            green = (byte)(gSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
-                            blue = (byte)(bSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
-                            reserved = 0
-                        };
-                        //{
-                        //    red = (byte)avgTime,
-                        //    green = (byte)avgTime,
-                        //    blue = (byte)avgTime
-                        //};
-
-
-
-                        window[x, y] = combined;
-
-
                     });
-
-                    //I realize the increment isn't thread safe but I figure it's not that important that it is.
-                    if (++updateCount % 16 == 0)
+                }
+                else
+                {
+                    for (int x = 0; x < window.ClientWidth; x++)
                     {
-                        lock (window)
+                        for (int y = 0; y < window.ClientHeight; y++)
+                        {
+                            window[x, y] = CalculatePixelColor(x, y, window, cameraIsInsideObject);
+                        }
+
+                        if (++verticalLinesRendered % 16 == 0)
                         {
                             window.UpdateClient();
                         }
                     }
-                });
+                }
 
                 window.UpdateClient();
 
                 while (!window.IsClosed) ;
             }
+        }
+
+        private static ARGBColor CalculatePixelColor(int x, int y, PixelWindow window, bool cameraIsInsideObject)
+        {
+            
+
+            //long totalColorCalcTime = 0;
+            //Stopwatch stopWatch = new Stopwatch();
+
+            int rSum = 0;
+            int gSum = 0;
+            int bSum = 0;
+
+            for (int subX = 0; subX < scene.options.antialiasAmount; subX++)
+            {
+                for (int subY = 0; subY < scene.options.antialiasAmount; subY++)
+                {
+                    Ray ray = scene.camera.RayAtPixel(x + (subX / (float)scene.options.antialiasAmount), y + (subY / (float)scene.options.antialiasAmount), window);
+
+                    //stopWatch.Restart();
+                    ARGBColor color = ColorOf(ray, scene.options.maxReflections, scene.options.maxRefractions, cameraIsInsideObject);
+                    //stopWatch.Stop();
+                    //checked { totalColorCalcTime += stopWatch.ElapsedTicks; }
+                    rSum += color.red;
+                    gSum += color.green;
+                    bSum += color.blue;
+                }
+            }
+
+            //long avgTime = (totalColorCalcTime * 2 / (scene.options.antialiasAmount * scene.options.antialiasAmount));
+
+            ARGBColor combined = new ARGBColor
+            {
+                red = (byte)(rSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
+                green = (byte)(gSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
+                blue = (byte)(bSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
+                reserved = 0
+            };
+            //{
+            //    red = (byte)avgTime,
+            //    green = (byte)avgTime,
+            //    blue = (byte)avgTime
+            //};
+            return combined;
         }
 
         static ARGBColor ColorOf(Ray ray, int reflectionsLeft, int refractionsLeft, bool rayIsInObject)
@@ -261,8 +270,6 @@ namespace Raytracer
             }
             if (refractionsLeft > 0 && hitObj.refractivity > 0)
             {
-                //TODO: figure out way to track whether ray is indside or outside, refraction indexes, etc.
-
                 float refractIndexFrom = rayIsInObject ? hitObj.refractionIndex : airRefractIndex;
                 float refractIndexTo = rayIsInObject ? airRefractIndex : hitObj.refractionIndex;
 

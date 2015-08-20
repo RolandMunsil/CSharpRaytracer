@@ -16,6 +16,7 @@ namespace Raytracer
         public struct RenderOptions
         {
             public int antialiasAmount;
+            public bool parallelRendering;
             public bool lightingEnabled;
             public float ambientLight;
             public int maxReflections;
@@ -28,7 +29,5 @@ namespace Raytracer
         public LightSource[] lightSources;
         public Camera camera;
         public RenderOptions options;
-
-
     }
 }
