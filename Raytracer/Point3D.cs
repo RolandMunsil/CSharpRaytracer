@@ -8,15 +8,15 @@ namespace Raytracer
 {
     struct Point3D
     {
-        public float X;
-        public float Y;
-        public float Z;
+        public float x;
+        public float y;
+        public float z;
 
         public Point3D(float x, float y, float z)
         {
-            this.X = x;
-            this.Y = y;
-            this.Z = z;
+            this.x = x;
+            this.y = y;
+            this.z = z;
         }
 
         public static Point3D Zero
@@ -29,22 +29,22 @@ namespace Raytracer
 
         public static Point3D operator +(Point3D left, Vector3D right)
         {
-            return new Point3D(left.X + right.X, left.Y + right.Y, left.Z + right.Z);
+            return new Point3D(left.x + right.x, left.y + right.y, left.z + right.z);
         }
 
         public static Vector3D operator -(Point3D left, Point3D right)
         {
-            return new Vector3D(left.X - right.X, left.Y - right.Y, left.Z - right.Z);
+            return new Vector3D(left.x - right.x, left.y - right.y, left.z - right.z);
         }
 
         public static Point3D operator *(Point3D vector, float multiplier)
         {
-            return new Point3D(vector.X * multiplier, vector.Y * multiplier, vector.Z * multiplier);
+            return new Point3D(vector.x * multiplier, vector.y * multiplier, vector.z * multiplier);
         }
 
         public override string ToString()
         {
-            return "X=" + X + " Y=" + Y + " Z=" + Z;
+            return "X=" + x + " Y=" + y + " Z=" + z;
         }
     }
 }

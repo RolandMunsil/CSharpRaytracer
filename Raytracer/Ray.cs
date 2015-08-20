@@ -45,17 +45,17 @@ namespace Raytracer
 
         public float ValueWhenXIs(float x)
         {
-            return (x - origin.X) / direction.X;
+            return (x - origin.x) / direction.x;
         }
 
         public float ValueWhenYIs(float y)
         {
-            return (y - origin.Y) / direction.Y;
+            return (y - origin.y) / direction.y;
         }
 
         public float ValueWhenZIs(float z)
         {
-            return (z - origin.Z) / direction.Z;
+            return (z - origin.z) / direction.z;
         }
     }
 }

@@ -21,15 +21,15 @@ namespace Raytracer
 
         public override Intersection GetNearestIntersection(Ray ray)
         {
-            if(ray.Direction.Y == 0)
+            if(ray.Direction.y == 0)
             {
-                if(ray.Origin.Y == Y)
+                if(ray.Origin.y == Y)
                 {
                     return new Intersection
                     {
                         value = 0,
                         normal = YPlane.Normal,
-                        color = ColorAt(ray.Origin.X, ray.Origin.Z)
+                        color = ColorAt(ray.Origin.x, ray.Origin.z)
                     };
                 }
                 else
@@ -45,7 +45,7 @@ namespace Raytracer
                 return new Intersection
                 {
                     value = value,
-                    color = ColorAt(point.X, point.Z),
+                    color = ColorAt(point.x, point.z),
                     normal = YPlane.Normal
                 };
             }
@@ -70,7 +70,7 @@ namespace Raytracer
 
         public override bool Contains(Point3D point)
         {
-            return point.Y == Y;
+            return point.y == Y;
         }
 
         private ARGBColor ColorAt(float x, float z)

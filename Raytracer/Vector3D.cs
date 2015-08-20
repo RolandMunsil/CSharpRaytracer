@@ -10,15 +10,15 @@ namespace Raytracer
     [DebuggerDisplay("({X}, {Y}, {Z})")]
     struct Vector3D
     {
-        public float X;
-        public float Y;
-        public float Z;
+        public float x;
+        public float y;
+        public float z;
 
         public Vector3D(float x, float y, float z)
         {
-            this.X = x;
-            this.Y = y;
-            this.Z = z;
+            this.x = x;
+            this.y = y;
+            this.z = z;
         }
         /// <summary>
         /// Some example values:
@@ -31,7 +31,7 @@ namespace Raytracer
         {
             get
             {
-                return (float)Math.Atan2(X, Z);
+                return (float)Math.Atan2(x, z);
             }
         }
 
@@ -55,7 +55,7 @@ namespace Raytracer
             get
             {
                 Vector3D onVerticalPlane = this.Rotated(-AngleXZ, 0);
-                return (float)Math.Atan2(onVerticalPlane.Y, onVerticalPlane.Z);
+                return (float)Math.Atan2(onVerticalPlane.y, onVerticalPlane.z);
             }
         }
 
@@ -63,7 +63,7 @@ namespace Raytracer
         {
             get
             {
-                return X * X + Y * Y + Z * Z;
+                return x * x + y * y + z * z;
             }
         }
 
@@ -71,7 +71,7 @@ namespace Raytracer
         {
             get
             {
-                return (float)Math.Sqrt(X * X + Y * Y + Z * Z);
+                return (float)Math.Sqrt(x * x + y * y + z * z);
             }
         }
 
@@ -87,7 +87,7 @@ namespace Raytracer
 
         public static float DotProduct(Vector3D vector1, Vector3D vector2)
         {
-            return (vector1.X * vector2.X) + (vector1.Y * vector2.Y) + (vector1.Z * vector2.Z);
+            return (vector1.x * vector2.x) + (vector1.y * vector2.y) + (vector1.z * vector2.z);
         }
 
         public void Rotate(float rotationXZ, float rotationYZ)
@@ -97,23 +97,23 @@ namespace Raytracer
             if (rotationYZ != 0)
             {
                 //First do vertical
-                float lengthYZ = (float)Math.Sqrt(Y * Y + Z * Z);
-                float angleYZ = (float)Math.Atan2(Y, Z);
+                float lengthYZ = (float)Math.Sqrt(y * y + z * z);
+                float angleYZ = (float)Math.Atan2(y, z);
 
                 float newAngle = angleYZ + rotationYZ;
-                this.Y = (float)Math.Sin(newAngle) * lengthYZ;
-                this.Z = (float)Math.Cos(newAngle) * lengthYZ;
+                this.y = (float)Math.Sin(newAngle) * lengthYZ;
+                this.z = (float)Math.Cos(newAngle) * lengthYZ;
             }
 
             if (rotationXZ != 0)
             {
                 //Now do horizontal
-                float lengthXZ = (float)Math.Sqrt(X * X + Z * Z);
-                float angleXZ = (float)Math.Atan2(X, Z);
+                float lengthXZ = (float)Math.Sqrt(x * x + z * z);
+                float angleXZ = (float)Math.Atan2(x, z);
 
                 float newAngle = angleXZ + rotationXZ;
-                this.X = (float)Math.Sin(newAngle) * lengthXZ;
-                this.Z = (float)Math.Cos(newAngle) * lengthXZ;
+                this.x = (float)Math.Sin(newAngle) * lengthXZ;
+                this.z = (float)Math.Cos(newAngle) * lengthXZ;
             }
         }
 
@@ -207,7 +207,7 @@ namespace Raytracer
 
             float ndoti, two_ndoti, ndoti2, a, b, b2, D2;
             Vector3D T = new Vector3D();
-            ndoti = N.X * I.X + N.Y * I.Y + N.Z * I.Z;     // 3 mul, 2 add
+            ndoti = N.x * I.x + N.y * I.y + N.z * I.z;     // 3 mul, 2 add
             ndoti2 = ndoti * ndoti;                    // 1 mul
             if (ndoti >= 0.0) { b = r; b2 = r2; } else { b = invr; b2 = invr2; }
             D2 = 1.0f - b2 * (1.0f - ndoti2);
@@ -218,25 +218,25 @@ namespace Raytracer
                     a = b * ndoti - (float)Math.Sqrt(D2); // 2 mul, 3 add, 1 sqrt
                 else
                     a = b * ndoti + (float)Math.Sqrt(D2);
-                T.X = a * N.X - b * I.X;     // 6 mul, 3 add
-                T.Y = a * N.Y - b * I.Y;     // ----totals---------
-                T.Z = a * N.Z - b * I.Z;     // 12 mul, 8 add, 1 sqrt!
+                T.x = a * N.x - b * I.x;     // 6 mul, 3 add
+                T.y = a * N.y - b * I.y;     // ----totals---------
+                T.z = a * N.z - b * I.z;     // 12 mul, 8 add, 1 sqrt!
             }
             else
             {
                 // total internal reflection
                 // this usually doesn't happen, so I don't count it.
                 two_ndoti = ndoti + ndoti;         // +1 add
-                T.X = two_ndoti * N.X - I.X;      // +3 adds, +3 muls
-                T.Y = two_ndoti * N.Y - I.Y;
-                T.Z = two_ndoti * N.Z - I.Z;
+                T.x = two_ndoti * N.x - I.x;      // +3 adds, +3 muls
+                T.y = two_ndoti * N.y - I.y;
+                T.z = two_ndoti * N.z - I.z;
             }
             return T;
         }
 
         public static bool operator ==(Vector3D vector1, Vector3D vector2)
         {
-            return vector1.X == vector2.X && vector1.Y == vector2.Y && vector1.Z == vector2.Z;
+            return vector1.x == vector2.x && vector1.y == vector2.y && vector1.z == vector2.z;
         }
         public static bool operator !=(Vector3D vector1, Vector3D vector2)
         {
@@ -245,9 +245,9 @@ namespace Raytracer
         public override int GetHashCode()
         {
             int hash = 13;
-            hash = hash * 47 + X.GetHashCode();
-            hash = hash * 47 + Y.GetHashCode();
-            hash = hash * 47 + Z.GetHashCode();
+            hash = hash * 47 + x.GetHashCode();
+            hash = hash * 47 + y.GetHashCode();
+            hash = hash * 47 + z.GetHashCode();
             return hash;
         }
         public override bool Equals(object obj)
@@ -261,29 +261,29 @@ namespace Raytracer
 
         public static Vector3D operator +(Vector3D vector1, Vector3D vector2)
         {
-            return new Vector3D(vector1.X + vector2.X, vector1.Y + vector2.Y, vector1.Z + vector2.Z);
+            return new Vector3D(vector1.x + vector2.x, vector1.y + vector2.y, vector1.z + vector2.z);
         }
         public static Vector3D operator -(Vector3D left, Vector3D right)
         {
-            return new Vector3D(left.X - right.X, left.Y - right.Y, left.Z - right.Z);
+            return new Vector3D(left.x - right.x, left.y - right.y, left.z - right.z);
         }
         public static Vector3D operator /(Vector3D vector, float divisor)
         {
-            return new Vector3D(vector.X / divisor, vector.Y / divisor, vector.Z / divisor);
+            return new Vector3D(vector.x / divisor, vector.y / divisor, vector.z / divisor);
         }
         public static Vector3D operator *(Vector3D vector, float multiplier)
         {
-            return new Vector3D(vector.X * multiplier, vector.Y * multiplier, vector.Z * multiplier);
+            return new Vector3D(vector.x * multiplier, vector.y * multiplier, vector.z * multiplier);
         }
 
         public static Vector3D operator -(Vector3D vector)
         {
-            return new Vector3D(-vector.X, -vector.Y, -vector.Z);
+            return new Vector3D(-vector.x, -vector.y, -vector.z);
         }
 
         public override string ToString()
         {
-            return "X=" + X + " Y=" + Y + " Z=" + Z;
+            return "X=" + x + " Y=" + y + " Z=" + z;
         }
     }
 }
