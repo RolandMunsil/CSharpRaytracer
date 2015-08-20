@@ -27,6 +27,11 @@ namespace Raytracer
             }
         }
 
+        public static Point3D operator +(Point3D left, Vector3D right)
+        {
+            return new Point3D(left.X + right.X, left.Y + right.Y, left.Z + right.Z);
+        }
+
         public static Vector3D operator -(Point3D left, Point3D right)
         {
             return new Vector3D(left.X - right.X, left.Y - right.Y, left.Z - right.Z);

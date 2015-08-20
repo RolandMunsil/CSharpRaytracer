@@ -8,23 +8,29 @@ namespace Raytracer
 {
     class Ray
     {
-        public LinearEquation XEquation;
-        public LinearEquation YEquation;
-        public LinearEquation ZEquation;
+        private Point3D origin;
+        private Vector3D direction;
 
         public Point3D Origin
         {
             get
             {
-                return new Point3D(XEquation.intercept, YEquation.intercept, ZEquation.intercept);
+                return origin;
+            }
+        }
+
+        public Vector3D Direction
+        {
+            get
+            {
+                return direction;
             }
         }
 
         public Ray(Point3D origin, Vector3D direction)
         {
-            XEquation = new LinearEquation(direction.X, origin.X);
-            YEquation = new LinearEquation(direction.Y, origin.Y);
-            ZEquation = new LinearEquation(direction.Z, origin.Z);
+            this.origin = origin;
+            this.direction = direction;
         }
 
         public Ray(Point3D origin, Point3D endPoint)
@@ -34,12 +40,22 @@ namespace Raytracer
 
         public Point3D PointAt(float t)
         {
-            return new Point3D(XEquation.ValueAt(t), YEquation.ValueAt(t), ZEquation.ValueAt(t));
+            return origin + (direction * t);
         }
 
-        public Vector3D ToVector3D()
+        public float ValueWhenXIs(float x)
         {
-            return new Vector3D(XEquation.slope, YEquation.slope, ZEquation.slope);
+            return (x - origin.X) / direction.X;
+        }
+
+        public float ValueWhenYIs(float y)
+        {
+            return (y - origin.Y) / direction.Y;
+        }
+
+        public float ValueWhenZIs(float z)
+        {
+            return (z - origin.Z) / direction.Z;
         }
     }
 }

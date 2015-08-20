@@ -21,9 +21,9 @@ namespace Raytracer
 
         public override Intersection GetNearestIntersection(Ray ray)
         {
-            if(ray.YEquation.slope == 0)
+            if(ray.Direction.Y == 0)
             {
-                if(ray.YEquation.intercept == Y)
+                if(ray.Origin.Y == Y)
                 {
                     return new Intersection
                     {
@@ -38,7 +38,7 @@ namespace Raytracer
                 }
             }
 
-            float value = ray.YEquation.SolveWhenValueIs(Y);
+            float value = ray.ValueWhenYIs(Y);
             Point3D point = ray.PointAt(value);
             if (value >= Intersection.MinValue)
             {

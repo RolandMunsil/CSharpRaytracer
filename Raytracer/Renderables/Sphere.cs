@@ -45,21 +45,21 @@ namespace Raytracer
             //LinearEquation combinedX = ray.XEquation - center.X;
             //LinearEquation combinedY = ray.YEquation - center.Y;
             //LinearEquation combinedZ = ray.ZEquation - center.Z;
-            float adjXIntercept = ray.XEquation.intercept - center.X;
-            float adjYIntercept = ray.YEquation.intercept - center.Y;
-            float adjZIntercept = ray.ZEquation.intercept - center.Z;
+            float adjXIntercept = ray.Origin.X - center.X;
+            float adjYIntercept = ray.Origin.Y - center.Y;
+            float adjZIntercept = ray.Origin.Z - center.Z;
 
             //Optimize these two lines.
             //QuadraticEquation combined = combinedX * combinedX + combinedY * combinedY + combinedZ * combinedZ;
             //combined -= radius * radius;
 
-            float quadCoefficient = ray.XEquation.slope * ray.XEquation.slope +
-                                    ray.YEquation.slope * ray.YEquation.slope +
-                                    ray.ZEquation.slope * ray.ZEquation.slope;
+            float quadCoefficient = ray.Direction.X * ray.Direction.X +
+                                    ray.Direction.Y * ray.Direction.Y +
+                                    ray.Direction.Z * ray.Direction.Z;
 
-            float linearCoefficient = ((ray.XEquation.slope * adjXIntercept) * 2) +
-                                      ((ray.YEquation.slope * adjYIntercept) * 2) +
-                                      ((ray.ZEquation.slope * adjZIntercept) * 2);
+            float linearCoefficient = ((ray.Direction.X * adjXIntercept) * 2) +
+                                      ((ray.Direction.Y * adjYIntercept) * 2) +
+                                      ((ray.Direction.Z * adjZIntercept) * 2);
 
             float constant = adjXIntercept * adjXIntercept +
                              adjYIntercept * adjYIntercept +

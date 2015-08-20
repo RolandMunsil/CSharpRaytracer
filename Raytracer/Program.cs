@@ -263,7 +263,7 @@ namespace Raytracer
 
             if (reflectionsLeft > 0 && hitObj.reflectivity > 0)
             {
-                Vector3D reflectedVector = ray.ToVector3D().Reflected(closestIntersection.normal);
+                Vector3D reflectedVector = ray.Direction.Reflected(closestIntersection.normal);
                 Ray reflectedRay = new Ray(hitPoint, reflectedVector);
                 reflectedColor = ColorOf(reflectedRay, --reflectionsLeft, refractionsLeft, rayIsInObject);
 
@@ -274,7 +274,7 @@ namespace Raytracer
                 float refractIndexTo = rayIsInObject ? airRefractIndex : hitObj.refractionIndex;
 
                 bool totalInternalReflection;
-                Vector3D refractedVector = ray.ToVector3D().Refracted(closestIntersection.normal, refractIndexFrom, refractIndexTo, out totalInternalReflection);
+                Vector3D refractedVector = ray.Direction.Refracted(closestIntersection.normal, refractIndexFrom, refractIndexTo, out totalInternalReflection);
                 Ray refractedRay = new Ray(hitPoint, refractedVector);
                 refractedColor = ColorOf(refractedRay, reflectionsLeft, --refractionsLeft, (!rayIsInObject) ^ totalInternalReflection);
             }
