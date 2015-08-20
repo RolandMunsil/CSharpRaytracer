@@ -37,6 +37,11 @@ namespace Raytracer
             return new Vector3D(left.X - right.X, left.Y - right.Y, left.Z - right.Z);
         }
 
+        public static Point3D operator *(Point3D vector, float multiplier)
+        {
+            return new Point3D(vector.X * multiplier, vector.Y * multiplier, vector.Z * multiplier);
+        }
+
         public override string ToString()
         {
             return "X=" + X + " Y=" + Y + " Z=" + Z;
