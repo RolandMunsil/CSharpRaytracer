@@ -49,6 +49,9 @@ namespace Raytracer
             bool valueFound = false;
             float closestValidValue = Intersection.FarthestAway.value;
             int normalComponentIndex = -1;
+
+            int hackySign = 0;
+
             foreach (var tuple in coordsToCheck)
             {
                 float component = tuple.Item1;
@@ -61,6 +64,8 @@ namespace Raytracer
                     pointToCheck[componentIndex] = component;
                     if (this.Contains(pointToCheck))
                     {
+                        hackySign = Math.Sign(pointToCheck[componentIndex]);
+
                         valueFound = true;
                         closestValidValue = value;
                         normalComponentIndex = componentIndex;
@@ -75,7 +80,7 @@ namespace Raytracer
             else
             {
                 Vector3D normal = Vector3D.Zero;
-                normal[normalComponentIndex] = 1;
+                normal[normalComponentIndex] = 1 * hackySign;
                 return new Intersection
                 {
                     value = closestValidValue,

@@ -197,7 +197,7 @@ namespace Raytracer
             //totalInternalReflection = false;
             //return RefractSlow(surfaceNormal, this, refractIndexFrom, refractIndexTo);
 
-            return RefractedJava(surfaceNormal, refractIndexFrom, refractIndexTo, out totalInternalReflection);
+            return RefractedV2(surfaceNormal, refractIndexFrom, refractIndexTo, out totalInternalReflection);
 
             //Vector3D normal = (surfaceNormal).Normalized();
             //Vector3D thisNormalized = this.Normalized();
@@ -291,7 +291,7 @@ namespace Raytracer
             if (cosθ1 <= 0)
             {
                 n = -n;
-                cosθ1 = DotProduct(-n, l);
+                cosθ1 = DotProduct(n, l);
             }
             else
             {
@@ -310,7 +310,7 @@ namespace Raytracer
             }
 
             float cosθ2 = (float)Math.Sqrt(1 - (sinθ2 * sinθ2));
-            Vector3D vrefract = l * (n1 / n2) + n * ((n1 / n2) * cosθ1 - cosθ2);
+            Vector3D vrefract = l * (n1 / n2) + surfaceNormal * ((n1 / n2) * cosθ1 - cosθ2);
             totalInternalReflection = false;
 
 

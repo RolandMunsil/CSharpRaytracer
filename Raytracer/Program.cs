@@ -26,7 +26,7 @@ namespace Raytracer
 
         static Scene scene = new Scene
             {
-                skyColor = (ARGBColor)0xFFB2FFFF,
+                skyColor = new ARGBColor(154, 206, 235),
                 renderedObjects = new Renderable[]
                 {
                     //new Sphere(new Point3D(0, 0, 0), 40)
@@ -35,17 +35,17 @@ namespace Raytracer
                     //    color = (ARGBColor)0xFF91D9D1
                     //},
                     //middleSphere,// - cutoutSphere,
-                    new Cuboid(Point3D.Zero, 60, 60, 60, ARGBColor.Red)
+                    new Cuboid(Point3D.Zero, 800, 800, 800, ARGBColor.Red)
                     {
                         reflectivity = 0f,
-                        refractivity = 1f,
-                        refractionIndex = 1.3f
+                        refractivity = .8f,
+                        refractionIndex = 1.5f
                     },
-                    new Sphere(new Point3D(0, 0, 0), 10)
+                    new Sphere(new Point3D(0, 0, 0), 200)
                     {
-                        reflectivity = 0.2f
+                        reflectivity = 0.6f
                     },
-                    new YPlane(-50)
+                    new YPlane(-400)
                     {
                         reflectivity = 0f,
                     }
@@ -58,20 +58,20 @@ namespace Raytracer
                         maxLitDistance = 300
                     }
                 },
-                camera = new Camera(new Point3D(10, 30, -80), new Point3D(-32, -15, 0), Camera.Projection.Perspective)
+                camera = new Camera(new Point3D(100, 300, -800), new Point3D(0, 0, 0), Camera.Projection.Perspective)
                 {
                     //put them here instead of in the constructor for clarity
                     focalLength = 700,
-                    zoom = 4
+                    zoom = 1
                 },
                 options = new Scene.RenderOptions
                 {
-                    antialiasAmount = 4,
+                    antialiasAmount = 2,
                     parallelRendering = true,
                     lightingEnabled = false,
                     ambientLight = 0.3f,
-                    maxReflections = 80,
-                    maxRefractions = 80,
+                    maxReflections = 16,
+                    maxRefractions = 16,
 
                     imageWidth = 900,
                     imageHeight = 900,
@@ -91,6 +91,10 @@ namespace Raytracer
 
         public static void Main(string[] args)
         {
+            scene.camera.position = new Point3D(1099.8883652832799f, 843.5992676516778f, -799.115673436598f);
+            scene.camera.facingAngleHoriz = -0.9424777960769379f;
+            scene.camera.facingAngleVert = -0.5553603672697958f;
+
             using (PixelWindow window = new PixelWindow(scene.options.imageWidth, scene.options.imageHeight, "Raytracing"))
             {
                 bool cameraIsInsideObject = scene.renderedObjects.Any(obj => obj.Contains(scene.camera.position));
@@ -162,7 +166,7 @@ namespace Raytracer
 
         private static ARGBColor CalculatePixelColor(int x, int y, PixelWindow window, bool cameraIsInsideObject)
         {
-            if (x == 850 && y == 350)
+            if (x == 175 && y == 350)
             {
                 //Debugger.Break();
             }
