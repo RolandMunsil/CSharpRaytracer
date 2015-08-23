@@ -11,10 +11,10 @@ namespace Raytracer
 {
     static class Program
     {
-        static Sphere middleSphere = new Sphere(new Point3D(0, 0, 0), 40)
+        static Sphere middleSphere = new Sphere(new Point3D(0, 0, 0), 20)
         {
             reflectivity = 0.0f,
-            refractivity = 1.0f,
+            refractivity = 0.0f,
             refractionIndex = 1.3f,
             color = (ARGBColor)0xFF91D9D1
         };
@@ -34,7 +34,13 @@ namespace Raytracer
                     //    reflectionAmount = .6f,
                     //    color = (ARGBColor)0xFF91D9D1
                     //},
-                    middleSphere,// - cutoutSphere,
+                    //middleSphere,// - cutoutSphere,
+                    new Cuboid(Point3D.Zero, 60, 60, 60, ARGBColor.Red)
+                    {
+                        reflectivity = 0f,
+                        refractivity = 1f,
+                        refractionIndex = 1.3f
+                    },
                     new YPlane(-50)
                     {
                         reflectivity = 0f,
@@ -48,7 +54,7 @@ namespace Raytracer
                         maxLitDistance = 300
                     }
                 },
-                camera = new Camera(new Point3D(0, 80, -80), new Point3D(0, 0, 0), Camera.Projection.Perspective)
+                camera = new Camera(new Point3D(10, 30, -80), new Point3D(0, 0, 0), Camera.Projection.Perspective)
                 {
                     //put them here instead of in the constructor for clarity
                     focalLength = 700,
@@ -56,7 +62,7 @@ namespace Raytracer
                 },
                 options = new Scene.RenderOptions
                 {
-                    antialiasAmount = 4,
+                    antialiasAmount = 1,
                     parallelRendering = true,
                     lightingEnabled = false,
                     ambientLight = 0.3f,
@@ -69,8 +75,8 @@ namespace Raytracer
                     //animationFunction = delegate(int frameCount)
                     //{
                     //    //middleSphere.refractionIndex += .01f;
-                    //    //Point3D newCameraPos = new Point3D(0, 30 + frameCount * 5, 0);
-                    //    //scene.camera.ChangePositionAndLookingAt(newCameraPos, new Point3D(0, 0, 0));
+                    //    Point3D newCameraPos = new Point3D(0, 80 - frameCount * 5, -80);
+                    //    scene.camera.ChangePositionAndLookingAt(newCameraPos, new Point3D(0, 0, 0));
                     //}
                 }
             };
@@ -150,7 +156,10 @@ namespace Raytracer
 
         private static ARGBColor CalculatePixelColor(int x, int y, PixelWindow window, bool cameraIsInsideObject)
         {
-            
+            if (x == 850 && y == 350)
+            {
+                //Debugger.Break();
+            }
 
             //long totalColorCalcTime = 0;
             //Stopwatch stopWatch = new Stopwatch();

@@ -42,6 +42,7 @@
     <Compile Include="Equations.cs" />
     <Compile Include="LightSource.cs" />
     <Compile Include="Renderables\CSGObject.cs" />
+    <Compile Include="Renderables\Cuboid.cs" />
     <Compile Include="Renderables\Renderable.cs" />
     <Compile Include="Point3D.cs" />
     <Compile Include="Program.cs" />

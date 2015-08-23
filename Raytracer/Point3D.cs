@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Raytracer
 {
+    [DebuggerDisplay("({x}, {y}, {z})")]
     struct Point3D
     {
         public float x;
@@ -17,6 +19,31 @@ namespace Raytracer
             this.x = x;
             this.y = y;
             this.z = z;
+        }
+
+        //I feel like maybe this is a horrible hacky thing.
+        public float this[int index]
+        {
+            get
+            {
+                switch (index)
+                {
+                    case 0: return x;
+                    case 1: return y;
+                    case 2: return z;
+                    default: throw new IndexOutOfRangeException();
+                }
+            }
+            set
+            {
+                switch (index)
+                {
+                    case 0: x = value; break;
+                    case 1: y = value; break;
+                    case 2: z = value; break;
+                    default: throw new IndexOutOfRangeException();
+                }
+            }
         }
 
         public static Point3D Zero

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Raytracer
 {
-    [DebuggerDisplay("({X}, {Y}, {Z})")]
+    [DebuggerDisplay("({x}, {y}, {z})")]
     struct Vector3D
     {
         public float x;
@@ -20,6 +20,40 @@ namespace Raytracer
             this.y = y;
             this.z = z;
         }
+
+        public static Vector3D Zero
+        {
+            get
+            {
+                return new Vector3D(0, 0, 0);
+            }
+        }
+
+        //I feel like maybe this is a horrible hacky thing.
+        public float this[int index]
+        {
+            get
+            {
+                switch (index)
+                {
+                    case 0: return x;
+                    case 1: return y;
+                    case 2: return z;
+                    default: throw new IndexOutOfRangeException();
+                }
+            }
+            set
+            {
+                switch (index)
+                {
+                    case 0: x = value; break;
+                    case 1: y = value; break;
+                    case 2: z = value; break;
+                    default: throw new IndexOutOfRangeException();
+                }
+            }
+        }
+
         /// <summary>
         /// Some example values:
         /// if the vector points directly +x, this will return π/2
@@ -128,19 +162,42 @@ namespace Raytracer
 
         public Vector3D Reflected(Vector3D surfaceNormal)
         {
-            Vector3D normalizedNormal = surfaceNormal.Normalized();
-            float dotProduct = DotProduct(this, normalizedNormal);
-            Vector3D dunno = (normalizedNormal * 2) * dotProduct;
+            Vector3D n = surfaceNormal.Normalized();
+            Vector3D l = this.Normalized();
 
-            return this - dunno;
+            float cosθ1 = DotProduct(-n, l);
+            if (cosθ1 <= 0)
+            {
+                n = -n;
+                cosθ1 = DotProduct(-n, l);
+            }
+            else
+            {
+                if (DotProduct(n, l) > 0)
+                {
+                    Debugger.Break();
+                }
+            }
+
+            return l + 2 * cosθ1 * n;
+
+            //Vector3D normalizedNormal = surfaceNormal.Normalized();
+            //float dotProduct = DotProduct(this, normalizedNormal);
+            //Vector3D dunno = (normalizedNormal * 2) * dotProduct;
+
+            //return this - dunno;
         }
+
+        //Alright so clearly something else is causing the problem. The refraction equation is correct but something else is screwing it up.
+        //Idea: compare Java calculations to this calculations on the same scene.
+
         //http://en.wikipedia.org/wiki/Snell's_law#Vector_form
         public Vector3D Refracted(Vector3D surfaceNormal, float refractIndexFrom, float refractIndexTo, out bool totalInternalReflection)
         {
             //totalInternalReflection = false;
             //return RefractSlow(surfaceNormal, this, refractIndexFrom, refractIndexTo);
 
-            return RefractedV2(surfaceNormal, refractIndexFrom, refractIndexTo, out totalInternalReflection);
+            return RefractedJava(surfaceNormal, refractIndexFrom, refractIndexTo, out totalInternalReflection);
 
             //Vector3D normal = (surfaceNormal).Normalized();
             //Vector3D thisNormalized = this.Normalized();
@@ -173,6 +230,55 @@ namespace Raytracer
             //}
         }
 
+        public Vector3D RefractedJava(Vector3D surfaceNormal, float refractIndexFrom, float refractIndexTo, out bool totalInternalReflection)
+        {
+            Vector3D negNormal = new Vector3D(-surfaceNormal.x, -surfaceNormal.y, -surfaceNormal.z);
+            negNormal.Normalize();
+            this.Normalize();
+
+            float cos1 = Vector3D.DotProduct(this, negNormal);
+            if (cos1 < 0)
+            {
+                cos1 = Vector3D.DotProduct(this, surfaceNormal.Normalized());
+
+                //int k = 1 / 0;
+            }
+
+            float refractRatio = refractIndexFrom / refractIndexTo;
+            float otherSine = refractRatio * (float)Math.Sqrt(1 - (cos1 * cos1));
+
+            if (otherSine > 1)
+            {
+                //Total internal reflection
+                totalInternalReflection = true;
+                return ReflectedJava(surfaceNormal);
+            }
+            else
+            {
+                float cos2 = (float)Math.Sqrt(1 - (otherSine * otherSine));
+                float nMult = (refractRatio * cos1) - cos2;
+
+                totalInternalReflection = false;
+                return (this * refractRatio) + (surfaceNormal * nMult);
+
+                //return new RefractionInfo(false,
+                //        Vector3D.Add(
+                //                Vector3D.Multiply(this, refractRatio),
+                //                Vector3D.Multiply(surfaceNormal, nMult)
+                //                )
+                //            );
+            }
+        }
+
+        public Vector3D ReflectedJava(Vector3D surfaceNormal)
+        {
+            Vector3D normalizedNormal = surfaceNormal.Normalized();
+            float dotProduct = DotProduct(this, normalizedNormal);
+            Vector3D dunno = (normalizedNormal * 2) * dotProduct;
+
+            return this - dunno;
+        }
+
         public Vector3D RefractedV2(Vector3D surfaceNormal, float refractIndexFrom, float refractIndexTo, out bool totalInternalReflection)
         {
             float n1 = refractIndexFrom;
@@ -187,6 +293,13 @@ namespace Raytracer
                 n = -n;
                 cosθ1 = DotProduct(-n, l);
             }
+            else
+            {
+                if (DotProduct(n, l) > 0)
+                {
+                    Debugger.Break();
+                }
+            }
 
             float sinθ2 = (n1 / n2) * (float)Math.Sqrt(1 - (cosθ1 * cosθ1));
 
@@ -199,6 +312,16 @@ namespace Raytracer
             float cosθ2 = (float)Math.Sqrt(1 - (sinθ2 * sinθ2));
             Vector3D vrefract = l * (n1 / n2) + n * ((n1 / n2) * cosθ1 - cosθ2);
             totalInternalReflection = false;
+
+
+            float inSnell = n1 * (float)Math.Sin(AngleBetween(n, -l));
+            float outSnell = n2 * (float)Math.Sin(AngleBetween(n, -vrefract));
+            if (Math.Abs(inSnell - outSnell) > 0.01)
+            {
+                Debugger.Break();
+            }
+
+
             return vrefract;
         }
 
@@ -234,6 +357,11 @@ namespace Raytracer
                 T.z = two_ndoti * N.z - I.z;
             }
             return T;
+        }
+
+        public float AngleBetween(Vector3D vec1, Vector3D vec2)
+        {
+            return (float)Math.Acos(DotProduct(vec1, vec2) / (vec1.Length * vec2.Length));
         }
 
         public static bool operator ==(Vector3D vector1, Vector3D vector2)
@@ -274,6 +402,11 @@ namespace Raytracer
             return new Vector3D(vector.x / divisor, vector.y / divisor, vector.z / divisor);
         }
         public static Vector3D operator *(Vector3D vector, float multiplier)
+        {
+            return new Vector3D(vector.x * multiplier, vector.y * multiplier, vector.z * multiplier);
+        }
+
+        public static Vector3D operator *(float multiplier, Vector3D vector)
         {
             return new Vector3D(vector.x * multiplier, vector.y * multiplier, vector.z * multiplier);
         }

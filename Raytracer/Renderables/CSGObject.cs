@@ -216,7 +216,7 @@ namespace Raytracer
                 case Operation.FirstWithoutSecond:
                     return renderable1.Contains(point) && !renderable2.Contains(point);
                 default:
-                    throw new NotImplementedException("Contains not implemented for " + operation);
+                    throw new NotImplementedException("Contains() not implemented for " + operation);
             }
         }
     }

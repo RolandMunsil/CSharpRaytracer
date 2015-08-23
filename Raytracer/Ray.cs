@@ -57,5 +57,10 @@ namespace Raytracer
         {
             return (z - origin.z) / direction.z;
         }
+
+        public float ValueWhenComponentIs(float value, int componentIndex)
+        {
+            return (value - origin[componentIndex]) / direction[componentIndex];
+        }
     }
 }
