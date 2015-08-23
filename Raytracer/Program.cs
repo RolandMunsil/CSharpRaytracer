@@ -41,6 +41,10 @@ namespace Raytracer
                         refractivity = 1f,
                         refractionIndex = 1.3f
                     },
+                    new Sphere(new Point3D(0, 0, 0), 10)
+                    {
+                        reflectivity = 0.2f
+                    },
                     new YPlane(-50)
                     {
                         reflectivity = 0f,
@@ -54,29 +58,31 @@ namespace Raytracer
                         maxLitDistance = 300
                     }
                 },
-                camera = new Camera(new Point3D(10, 30, -80), new Point3D(0, 0, 0), Camera.Projection.Perspective)
+                camera = new Camera(new Point3D(10, 30, -80), new Point3D(-32, -15, 0), Camera.Projection.Perspective)
                 {
                     //put them here instead of in the constructor for clarity
                     focalLength = 700,
-                    zoom = 1
+                    zoom = 4
                 },
                 options = new Scene.RenderOptions
                 {
-                    antialiasAmount = 1,
+                    antialiasAmount = 4,
                     parallelRendering = true,
                     lightingEnabled = false,
                     ambientLight = 0.3f,
-                    maxReflections = 10,
-                    maxRefractions = 10,
+                    maxReflections = 80,
+                    maxRefractions = 80,
 
-                    imageWidth = 1600,
+                    imageWidth = 900,
                     imageHeight = 900,
 
                     //animationFunction = delegate(int frameCount)
                     //{
+                    //    scene.renderedObjects[0].refractionIndex += .01f;
+
                     //    //middleSphere.refractionIndex += .01f;
-                    //    Point3D newCameraPos = new Point3D(0, 80 - frameCount * 5, -80);
-                    //    scene.camera.ChangePositionAndLookingAt(newCameraPos, new Point3D(0, 0, 0));
+                    //    //Point3D newCameraPos = new Point3D(0, 80 - frameCount * 5, -80);
+                    //    //scene.camera.ChangePositionAndLookingAt(newCameraPos, new Point3D(0, 0, 0));
                     //}
                 }
             };
