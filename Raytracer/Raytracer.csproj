@@ -41,6 +41,7 @@
     <Compile Include="Camera.cs" />
     <Compile Include="Equations.cs" />
     <Compile Include="LightSource.cs" />
+    <Compile Include="Matrix3x3.cs" />
     <Compile Include="Renderables\CSGObject.cs" />
     <Compile Include="Renderables\Cuboid.cs" />
     <Compile Include="Renderables\Renderable.cs" />

@@ -17,8 +17,10 @@ namespace Raytracer
         }
 
         public Point3D position;
-        public double facingAngleHoriz;
-        public double facingAngleVert;
+        //public double facingAngleHoriz;
+        //public double facingAngleVert;
+
+        Matrix3x3 rotationMatrix;
 
         Projection projection;
 
@@ -30,9 +32,10 @@ namespace Raytracer
         {
             this.position = position;
             Vector3D direction = lookingAt - position;
-            facingAngleHoriz = direction.AngleXZ;
-            facingAngleVert = direction.AngleFromHorizontalPlane;
+            //facingAngleHoriz = direction.AngleXZ;
+            //facingAngleVert = direction.AngleFromHorizontalPlane;
 
+            rotationMatrix = Matrix3x3.RotationAboutYAxis(direction.AngleXZ) * Matrix3x3.RotationAboutXAxis(direction.AngleFromHorizontalPlane);
             this.projection = projection;
         }
 
@@ -46,8 +49,8 @@ namespace Raytracer
             adjY /= zoom;
 
             Vector3D direction = new Vector3D(adjX * sortaFov, adjY * sortaFov, 1);
-            direction.Rotate(facingAngleHoriz, facingAngleVert);
-            return new Ray(position, direction);
+            //direction.Rotate(facingAngleHoriz, facingAngleVert);
+            return new Ray(position, rotationMatrix * direction);
         }
 
         //TODO: better name
@@ -55,8 +58,10 @@ namespace Raytracer
         {
             this.position = newPosition;
             Vector3D direction = newLookingAt - newPosition;
-            facingAngleHoriz = direction.AngleXZ;
-            facingAngleVert = direction.AngleFromHorizontalPlane;
+            double facingAngleHoriz = direction.AngleXZ;
+            double facingAngleVert = direction.AngleFromHorizontalPlane;
+
+            rotationMatrix = Matrix3x3.RotationAboutYAxis(facingAngleHoriz) * Matrix3x3.RotationAboutXAxis(facingAngleVert);
         }
     }
 }

@@ -126,6 +126,9 @@ namespace Raytracer
 
         public void Rotate(double rotationXZ, double rotationYZ)
         {
+
+
+
             //todo: optimize the heck out of this function
 
             if (rotationYZ != 0)
