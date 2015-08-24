@@ -88,8 +88,8 @@ namespace Raytracer
         {
             get
             {
-                Vector3D onVerticalPlane = this.Rotated(-AngleXZ, 0);
-                return Math.Atan2(onVerticalPlane.y, onVerticalPlane.z);
+                //return (Math.PI / 2) - (this.AngleTo(new Vector3D(0, 1, 0)));
+                return (Math.PI / 2) - Math.Acos(this.y / this.Length);
             }
         }
 
@@ -362,9 +362,14 @@ namespace Raytracer
             return T;
         }
 
-        public double AngleBetween(Vector3D vec1, Vector3D vec2)
+        public static double AngleBetween(Vector3D vec1, Vector3D vec2)
         {
             return Math.Acos(DotProduct(vec1, vec2) / (vec1.Length * vec2.Length));
+        }
+
+        public double AngleTo(Vector3D vec)
+        {
+            return AngleBetween(this, vec);
         }
 
         public static bool operator ==(Vector3D vector1, Vector3D vector2)

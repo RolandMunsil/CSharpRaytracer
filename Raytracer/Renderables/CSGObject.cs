@@ -33,13 +33,16 @@ namespace Raytracer
 
         public override Intersection GetNearestIntersection(Ray ray)
         {
-            Intersection[] obj1Intersections = renderable1.GetAllIntersections(ray);
-            Intersection[] obj2Intersections = renderable2.GetAllIntersections(ray);
+            Intersection[] obj1Intersections;
+            Intersection[] obj2Intersections;
 
-            if (obj1Intersections.Length == 0 && obj2Intersections.Length == 0)
-            {
-                return Intersection.None;
-            }
+            //Intersection[] obj1Intersections = renderable1.GetAllIntersections(ray);
+            //Intersection[] obj2Intersections = renderable2.GetAllIntersections(ray);
+
+            //if (obj1Intersections.Length == 0 && obj2Intersections.Length == 0)
+            //{
+            //    return Intersection.None;
+            //}
 
             //List<Intersection> validIntersections = new List<Intersection>(obj1Intersections.Length + obj2Intersections.Length);
 
@@ -51,11 +54,13 @@ namespace Raytracer
                     //Don't add points that are inside the other renderable
 
                     //If the only intersections are with the 1st object, we don't need to check contains or anything
+                    obj1Intersections = renderable1.GetAllIntersections(ray);
                     if (obj1Intersections.Length == 0)
                     {
-                        return obj2Intersections.Nearest();
+                        return renderable2.GetNearestIntersection(ray);
                     }
                     //If the only intersections are with the 2nd object, we don't need to check contains or anything
+                    obj2Intersections = renderable2.GetAllIntersections(ray);
                     if (obj2Intersections.Length == 0)
                     {
                         return obj1Intersections.Nearest();
@@ -89,7 +94,13 @@ namespace Raytracer
                     //Only add points that are inside the other renderable
 
                     //If the ray only passes through one object, there can't be any intersection.
-                    if (obj1Intersections.Length == 0 || obj2Intersections.Length == 0)
+                    obj1Intersections = renderable1.GetAllIntersections(ray);
+                    if (obj1Intersections.Length == 0)
+                    {
+                        return Intersection.None;
+                    }
+                    obj2Intersections = renderable2.GetAllIntersections(ray);
+                    if (obj2Intersections.Length == 0)
                     {
                         return Intersection.None;
                     }
@@ -122,11 +133,13 @@ namespace Raytracer
                     //All points are valid
 
                     //If the only intersections are with the 1st object, we don't need to check contains or anything
+                    obj1Intersections = renderable1.GetAllIntersections(ray);
                     if (obj1Intersections.Length == 0)
                     {
-                        return obj2Intersections.Nearest();
+                        return renderable2.GetNearestIntersection(ray);
                     }
                     //If the only intersections are with the 2nd object, we don't need to check contains or anything
+                    obj2Intersections = renderable2.GetAllIntersections(ray);
                     if (obj2Intersections.Length == 0)
                     {
                         return obj1Intersections.Nearest();
@@ -154,12 +167,13 @@ namespace Raytracer
                     //  On the surface of the second and inside the first
 
                     //If the ray does not pass through the first object, none of the points could possibly be inside of it
+                    obj1Intersections = renderable1.GetAllIntersections(ray);
                     if (obj1Intersections.Length == 0)
                     {
                         return Intersection.None;
                     }
                     //If the only intersections are with the 1st object, we don't need to check contains or anything
-                    else if (obj2Intersections.Length == 0)
+                    else if ((obj2Intersections = renderable2.GetAllIntersections(ray)).Length == 0)
                     {
                         return obj1Intersections.Nearest();
                     }

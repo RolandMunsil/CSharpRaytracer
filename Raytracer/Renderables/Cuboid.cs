@@ -18,6 +18,8 @@ namespace Raytracer
         double zLow;
         double zHigh;
 
+        List<Tuple<double, int>> coordsToCheck;
+
         public Cuboid(Point3D center, double xSize, double ySize, double zSize, ARGBColor color)
         {
             xLow = center.x - (xSize / 2);
@@ -30,13 +32,9 @@ namespace Raytracer
             zHigh = center.z + (zSize / 2);
 
             this.color = color;
-        }
 
-        public override Renderable.Intersection GetNearestIntersection(Ray ray)
-        {
-            //TODO: I feel like this is kind of terrible.
 
-            List<Tuple<double, int>> coordsToCheck = new List<Tuple<double, int>>(6)
+            coordsToCheck = new List<Tuple<double, int>>(6)
             {
                 new Tuple<double, int>(xLow,   0),
                 new Tuple<double, int>(xHigh,  0),
@@ -45,7 +43,11 @@ namespace Raytracer
                 new Tuple<double, int>(zLow,   2),
                 new Tuple<double, int>(zHigh,  2),
             };
+        }
 
+        public override Renderable.Intersection GetNearestIntersection(Ray ray)
+        {
+            //TODO: I feel like this is kind of terrible.
             bool valueFound = false;
             double closestValidValue = Intersection.FarthestAway.value;
             int normalComponentIndex = -1;
@@ -88,16 +90,6 @@ namespace Raytracer
 
         public override Renderable.Intersection[] GetAllIntersections(Ray ray)
         {
-            List<Tuple<double, int>> coordsToCheck = new List<Tuple<double, int>>(6)
-            {
-                new Tuple<double, int>(xLow,   0),
-                new Tuple<double, int>(xHigh,  0),
-                new Tuple<double, int>(yLow,   1),
-                new Tuple<double, int>(yHigh,  1),
-                new Tuple<double, int>(zLow,   2),
-                new Tuple<double, int>(zHigh,  2),
-            };
-
             List<Intersection> intersections = new List<Intersection>(6);
 
             foreach (var tuple in coordsToCheck)

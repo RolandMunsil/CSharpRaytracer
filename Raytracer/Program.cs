@@ -45,12 +45,21 @@ namespace Raytracer
                     //middleSphere,// - cutoutSphere,
                     new Cuboid(Point3D.Zero, 800, 800, 800, niceBlue)
                     {
-                        reflectivity = .5f,
+                        reflectivity = 0.5f,
                     } - 
                     new Sphere(new Point3D(0, 0, 0), 500)
                     {
                         color = niceBlue,
-                        reflectivity = 0.6f
+                        reflectivity = 0.5f
+                    },
+                    new Sphere(new Point3D(0, 0, 0), 300)
+                    {
+                        color = goodGray,
+                        reflectivity = 0.3f
+                    } -
+                    new Cuboid(Point3D.Zero, 550, 550, 550, goodGray)
+                    {
+                        reflectivity = 0.3f,
                     },
                     new YPlane(-400.01f)
                     {
@@ -65,17 +74,17 @@ namespace Raytracer
                         maxLitDistance = 3000
                     }
                 },
-                camera = new Camera(new Point3D(800, 1000, -1500), new Point3D(0, 0, 0), Camera.Projection.Perspective)
+                camera = new Camera(new Point3D(800, 900, -1600), new Point3D(0, 0, 0), Camera.Projection.Perspective)
                 {
                     //put them here instead of in the constructor for clarity
-                    focalLength = 700,
-                    zoom = 1.5f
+                    focalLength = 100,
+                    zoom = 15f
                 },
                 options = new Scene.RenderOptions
                 {
-                    antialiasAmount = 2,
-                    parallelRendering = false,
-                    lightingEnabled = true,
+                    antialiasAmount = 1,
+                    parallelRendering = true,
+                    lightingEnabled = false,
                     ambientLight = 0.2f,
                     maxReflections = 16,
                     maxRefractions = 16,
@@ -87,7 +96,7 @@ namespace Raytracer
                     //{
                     //    //double frameCountAdj = (1 + frameCount) / 30f;
 
-                    //    frameCount = 1;
+                    //    //frameCount = 1;
 
                     //    double yPos = ((Math.Sin(frameCount / 5f) + 1) / 2) * 1200;
 
@@ -119,6 +128,10 @@ namespace Raytracer
                     }
 
                     int verticalLinesRendered = 0;
+
+                    Stopwatch stopWatch = new Stopwatch();
+                    stopWatch.Start();
+
                     if (scene.options.parallelRendering)
                     {
                         Parallel.For(0, window.ClientWidth, delegate(int x, ParallelLoopState xState)
@@ -156,6 +169,8 @@ namespace Raytracer
                             }
                         }
                     }
+
+                    stopWatch.Stop();
 
                     window.UpdateClient();
 
