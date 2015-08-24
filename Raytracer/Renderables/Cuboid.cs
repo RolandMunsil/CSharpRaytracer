@@ -50,8 +50,6 @@ namespace Raytracer
             float closestValidValue = Intersection.FarthestAway.value;
             int normalComponentIndex = -1;
 
-            int hackySign = 0;
-
             foreach (var tuple in coordsToCheck)
             {
                 float component = tuple.Item1;
@@ -64,8 +62,6 @@ namespace Raytracer
                     pointToCheck[componentIndex] = component;
                     if (this.Contains(pointToCheck))
                     {
-                        hackySign = Math.Sign(pointToCheck[componentIndex]);
-
                         valueFound = true;
                         closestValidValue = value;
                         normalComponentIndex = componentIndex;
@@ -80,7 +76,7 @@ namespace Raytracer
             else
             {
                 Vector3D normal = Vector3D.Zero;
-                normal[normalComponentIndex] = 1 * hackySign;
+                normal[normalComponentIndex] = 1;
                 return new Intersection
                 {
                     value = closestValidValue,
@@ -92,7 +88,50 @@ namespace Raytracer
 
         public override Renderable.Intersection[] GetAllIntersections(Ray ray)
         {
-            throw new NotImplementedException();
+            List<Tuple<float, int>> coordsToCheck = new List<Tuple<float, int>>(6)
+            {
+                new Tuple<float, int>(xLow,   0),
+                new Tuple<float, int>(xHigh,  0),
+                new Tuple<float, int>(yLow,   1),
+                new Tuple<float, int>(yHigh,  1),
+                new Tuple<float, int>(zLow,   2),
+                new Tuple<float, int>(zHigh,  2),
+            };
+
+            List<Intersection> intersections = new List<Intersection>(6);
+
+            foreach (var tuple in coordsToCheck)
+            {
+                float component = tuple.Item1;
+                int componentIndex = tuple.Item2;
+
+                float value = ray.ValueWhenComponentIs(component, componentIndex);
+                if (value >= Intersection.MinValue)
+                {
+                    Point3D pointToCheck = ray.PointAt(value);
+                    pointToCheck[componentIndex] = component;
+                    if (this.Contains(pointToCheck))
+                    {
+                        Vector3D normal = Vector3D.Zero;
+                        normal[componentIndex] = 1;
+                        intersections.Add(new Intersection
+                        {
+                            value = value,
+                            normal = normal,
+                            color = color
+                        });
+                    }
+                }
+            }
+
+            if (intersections.Count == 0)
+            {
+                return Intersection.NoneArray;
+            }
+            else
+            {
+                return intersections.ToArray();
+            }
         }
 
         public override bool Contains(Point3D point)

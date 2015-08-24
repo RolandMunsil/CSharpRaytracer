@@ -6,15 +6,22 @@ using System.Threading.Tasks;
 using PixelWindowCSharp;
 using System.Diagnostics;
 using System.Threading;
+using System.IO;
 
 namespace Raytracer
 {
     static class Program
     {
-        static Sphere middleSphere = new Sphere(new Point3D(0, 0, 0), 20)
+        static ARGBColor niceBlue =   new ARGBColor(26, 128, 255);
+        static ARGBColor niceYellow = new ARGBColor(255, 240, 26);
+        static ARGBColor niceRed =    new ARGBColor(255, 76, 26);
+        static ARGBColor niceGreen =  new ARGBColor(76, 255, 26);
+        static ARGBColor goodGray =   new ARGBColor(196, 196, 196);
+
+        static Sphere middleSphere = new Sphere(new Point3D(0, 0, 0), 360)
         {
             reflectivity = 0.0f,
-            refractivity = 0.0f,
+            refractivity = 0.8f,
             refractionIndex = 1.3f,
             color = (ARGBColor)0xFF91D9D1
         };
@@ -29,56 +36,62 @@ namespace Raytracer
                 skyColor = new ARGBColor(154, 206, 235),
                 renderedObjects = new Renderable[]
                 {
+                    //middleSphere,
                     //new Sphere(new Point3D(0, 0, 0), 40)
                     //{
                     //    reflectionAmount = .6f,
                     //    color = (ARGBColor)0xFF91D9D1
                     //},
                     //middleSphere,// - cutoutSphere,
-                    new Cuboid(Point3D.Zero, 800, 800, 800, ARGBColor.Red)
+                    new Cuboid(Point3D.Zero, 800, 800, 800, niceBlue)
                     {
-                        reflectivity = 0f,
-                        refractivity = .8f,
-                        refractionIndex = 1.5f
-                    },
-                    new Sphere(new Point3D(0, 0, 0), 200)
+                        reflectivity = .5f,
+                    } - 
+                    new Sphere(new Point3D(0, 0, 0), 500)
                     {
+                        color = niceBlue,
                         reflectivity = 0.6f
                     },
-                    new YPlane(-400)
+                    new YPlane(-400.1f)
                     {
-                        reflectivity = 0f,
+                        reflectivity = .4f,
                     }
                 },
                 lightSources = new LightSource[]
                 {
                     new LightSource
                     {
-                        position = new Point3D(50, 50, 0),
-                        maxLitDistance = 300
+                        position = new Point3D(0, 1000, -1000),
+                        maxLitDistance = 3000
                     }
                 },
-                camera = new Camera(new Point3D(100, 300, -800), new Point3D(0, 0, 0), Camera.Projection.Perspective)
+                camera = new Camera(new Point3D(800, 1000, -1500), new Point3D(0, 0, 0), Camera.Projection.Perspective)
                 {
                     //put them here instead of in the constructor for clarity
                     focalLength = 700,
-                    zoom = 1
+                    zoom = 1.5f
                 },
                 options = new Scene.RenderOptions
                 {
-                    antialiasAmount = 2,
-                    parallelRendering = true,
-                    lightingEnabled = false,
-                    ambientLight = 0.3f,
-                    maxReflections = 16,
+                    antialiasAmount = 1,
+                    parallelRendering = false,
+                    lightingEnabled = true,
+                    ambientLight = 0.2f,
+                    maxReflections = 0,
                     maxRefractions = 16,
 
-                    imageWidth = 900,
+                    imageWidth = 1600,
                     imageHeight = 900,
 
                     //animationFunction = delegate(int frameCount)
                     //{
-                    //    scene.renderedObjects[0].refractionIndex += .01f;
+                    //    //float frameCountAdj = (1 + frameCount) / 30f;
+
+                    //    frameCount = 1;
+
+                    //    float yPos = (((float)Math.Sin(frameCount / 5f) + 1) / 2) * 1200;
+
+                    //    scene.camera.ChangePositionAndLookingAt(new Point3D(1600 * (float)Math.Cos(frameCount / 4f), yPos, 1600 * (float)Math.Sin(frameCount / 4f)), new Point3D(0, 0, 0));
 
                     //    //middleSphere.refractionIndex += .01f;
                     //    //Point3D newCameraPos = new Point3D(0, 80 - frameCount * 5, -80);
@@ -91,9 +104,7 @@ namespace Raytracer
 
         public static void Main(string[] args)
         {
-            scene.camera.position = new Point3D(1099.8883652832799f, 843.5992676516778f, -799.115673436598f);
-            scene.camera.facingAngleHoriz = -0.9424777960769379f;
-            scene.camera.facingAngleVert = -0.5553603672697958f;
+            //Directory.CreateDirectory("images");
 
             using (PixelWindow window = new PixelWindow(scene.options.imageWidth, scene.options.imageHeight, "Raytracing"))
             {
@@ -158,6 +169,9 @@ namespace Raytracer
                     }
 
                     window.UpdateClient();
+
+
+                    //window.BackBuffer.Save("images/" + frameCount.ToString("000") + ".png");
                 } while (scene.options.animationFunction != null);
 
                 while (!window.IsClosed);
@@ -166,8 +180,9 @@ namespace Raytracer
 
         private static ARGBColor CalculatePixelColor(int x, int y, PixelWindow window, bool cameraIsInsideObject)
         {
-            if (x == 175 && y == 350)
+            if (x == 800 && y == 456)
             {
+                //return ARGBColor.Red;
                 //Debugger.Break();
             }
 
