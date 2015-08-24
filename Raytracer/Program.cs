@@ -18,53 +18,35 @@ namespace Raytracer
         static ARGBColor niceGreen =  new ARGBColor(76, 255, 26);
         static ARGBColor goodGray =   new ARGBColor(196, 196, 196);
 
-        static Sphere middleSphere = new Sphere(new Point3D(0, 0, 0), 360)
+        static CSGObject coolCubeThing = (new Cuboid(Point3D.Zero, 800, 800, 800, niceBlue)
+                                  {
+                                      reflectivity = 0.1f,
+                                  } -
+                                  ( new Sphere(new Point3D( 0,      0,    0), 500,                 niceBlue) |
+                                    new Sphere(new Point3D( 400,  400, -400), 192.820323027550917, niceBlue) |
+                                    new Sphere(new Point3D(-400,  400, -400), 192.820323027550917, niceBlue) |
+                                    new Sphere(new Point3D( 400, -400, -400), 192.820323027550917, niceBlue) |
+                                    new Sphere(new Point3D(-400, -400, -400), 192.820323027550917, niceBlue) |
+                                    new Sphere(new Point3D( 400,  400,  400), 192.820323027550917, niceBlue) |
+                                    new Sphere(new Point3D(-400,  400,  400), 192.820323027550917, niceBlue) |
+                                    new Sphere(new Point3D( 400, -400,  400), 192.820323027550917, niceBlue)
+                                  ));
+
+        static YPlane plane = new YPlane(-400.01f)
         {
-            reflectivity = 0.0f,
-            refractivity = 0.8f,
-            refractionIndex = 1.3f,
-            color = (ARGBColor)0xFF91D9D1
+            reflectivity = .7f,
         };
-        //static Sphere cutoutSphere = new Sphere(new Point3D(0, 20, -20), 30)
-        //{
-        //    reflectivity = .6f,
-        //    color = (ARGBColor)0xFF910000
-        //};
+
+        static Sphere regularSphere = new Sphere(Point3D.Zero, 700, niceGreen);
 
         static Scene scene = new Scene
             {
                 skyColor = new ARGBColor(154, 206, 235),
                 renderedObjects = new Renderable[]
                 {
-                    //middleSphere,
-                    //new Sphere(new Point3D(0, 0, 0), 40)
-                    //{
-                    //    reflectionAmount = .6f,
-                    //    color = (ARGBColor)0xFF91D9D1
-                    //},
-                    //middleSphere,// - cutoutSphere,
-                    new Cuboid(Point3D.Zero, 800, 800, 800, niceBlue)
-                    {
-                        reflectivity = 0.5f,
-                    } - 
-                    new Sphere(new Point3D(0, 0, 0), 500)
-                    {
-                        color = niceBlue,
-                        reflectivity = 0.5f
-                    },
-                    new Sphere(new Point3D(0, 0, 0), 300)
-                    {
-                        color = goodGray,
-                        reflectivity = 0.3f
-                    } -
-                    new Cuboid(Point3D.Zero, 550, 550, 550, goodGray)
-                    {
-                        reflectivity = 0.3f,
-                    },
-                    new YPlane(-400.01f)
-                    {
-                        reflectivity = .4f,
-                    }
+                    coolCubeThing,
+                    //regularSphere,
+                    plane
                 },
                 lightSources = new LightSource[]
                 {
@@ -74,19 +56,19 @@ namespace Raytracer
                         maxLitDistance = 3000
                     }
                 },
-                camera = new Camera(new Point3D(800, 900, -1600), new Point3D(0, 0, 0), Camera.Projection.Perspective)
+                camera = new Camera(new Point3D(500, 900, -1600), new Point3D(0, 0, 0), Camera.Projection.Perspective)
                 {
                     //put them here instead of in the constructor for clarity
                     focalLength = 100,
-                    zoom = 15f
+                    zoom = 10f
                 },
                 options = new Scene.RenderOptions
                 {
                     antialiasAmount = 1,
                     parallelRendering = true,
-                    lightingEnabled = false,
-                    ambientLight = 0.2f,
-                    maxReflections = 16,
+                    lightingEnabled = true,
+                    ambientLight = 0.5f,
+                    maxReflections = 1,
                     maxRefractions = 16,
 
                     imageWidth = 1600,
@@ -98,9 +80,9 @@ namespace Raytracer
 
                     //    //frameCount = 1;
 
-                    //    double yPos = ((Math.Sin(frameCount / 5f) + 1) / 2) * 1200;
+                    //    double angle = (Math.PI * 2) * (frameCount / (double)(10.0 * 30));
 
-                    //    scene.camera.ChangePositionAndLookingAt(new Point3D(1600 * Math.Cos(frameCount / 4f), yPos, 1600 * Math.Sin(frameCount / 4f)), new Point3D(0, 0, 0));
+                    //    scene.camera.ChangePositionAndLookingAt(new Point3D(1700 * Math.Cos(angle), 900, 1700 * Math.Sin(angle)), new Point3D(0, 0, 0));
 
                     //    //middleSphere.refractionIndex += .01f;
                     //    //Point3D newCameraPos = new Point3D(0, 80 - frameCount * 5, -80);
@@ -174,8 +156,14 @@ namespace Raytracer
 
                     window.UpdateClient();
 
-
+                    //ffmpeg -f image2 -framerate 30 -i %03d.png -vcodec libx264 foo.avi
                     //window.BackBuffer.Save("images/" + frameCount.ToString("000") + ".png");
+
+                    //if (frameCount == 300)
+                    //{
+                    //    break;
+                    //}
+
                 } while (scene.options.animationFunction != null);
 
                 while (!window.IsClosed);

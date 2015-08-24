@@ -14,10 +14,12 @@ namespace Raytracer
 
         public ARGBColor color;
 
-        public Sphere(Point3D center, double radius)
+        public Sphere(Point3D center, double radius, ARGBColor color)
         {
             this.center = center;
             this.radius = radius;
+
+            this.color = color;
 
             //reflectionAmount = .6f;
             //refractionAmount = 0;

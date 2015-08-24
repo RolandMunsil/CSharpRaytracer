@@ -9,7 +9,6 @@ namespace Raytracer
 {
     abstract class Renderable
     {
-        //TODO: should this be precalculated or figured out once object and value is calculated?
         public struct Intersection
         {
             public double value;
@@ -28,7 +27,7 @@ namespace Raytracer
 
             public static readonly Intersection[] NoneArray = { };
 
-            public const double MinValue = (1 / 2048.0);
+            public const double MinValue = (1 / 32768.0);
 
             public static bool operator ==(Intersection intersection1, Intersection intersection2)
             {

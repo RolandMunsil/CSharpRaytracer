@@ -214,7 +214,48 @@ namespace Raytracer
 
         public override Renderable.Intersection[] GetAllIntersections(Ray ray)
         {
-            throw new NotImplementedException();
+            Intersection[] obj1Intersections = renderable1.GetAllIntersections(ray);
+            Intersection[] obj2Intersections = renderable2.GetAllIntersections(ray);
+
+            if (obj1Intersections.Length == 0 && obj2Intersections.Length == 0)
+            {
+                return Intersection.NoneArray;
+            }
+
+            List<Intersection> validIntersections = new List<Intersection>(obj1Intersections.Length + obj2Intersections.Length);
+
+            switch (operation)
+            {
+                case Operation.Or:
+                    //Don't add points that are inside the other renderable
+                    validIntersections.AddRange(obj1Intersections.Where(intersection => !renderable2.Contains(ray.PointAt(intersection.value))));
+                    validIntersections.AddRange(obj2Intersections.Where(intersection => !renderable1.Contains(ray.PointAt(intersection.value))));
+                    break;
+                case Operation.And:
+                    //Only add points that are inside the other renderable
+                    validIntersections.AddRange(obj1Intersections.Where(intersection => renderable2.Contains(ray.PointAt(intersection.value))));
+                    validIntersections.AddRange(obj2Intersections.Where(intersection => renderable1.Contains(ray.PointAt(intersection.value))));
+                    break;
+                case Operation.ExclusiveOr:
+                    //All points are valid
+                    validIntersections.AddRange(obj1Intersections);
+                    validIntersections.AddRange(obj2Intersections);
+                    break;
+                case Operation.FirstWithoutSecond:
+                    //Only add points that are either:
+                    //  On the surface of the first and not inside the second
+                    //  On the surface of the second and inside the first
+
+                    validIntersections.AddRange(obj1Intersections.Where(intersection => !renderable2.Contains(ray.PointAt(intersection.value))));
+                    validIntersections.AddRange(obj2Intersections.Where(intersection => renderable1.Contains(ray.PointAt(intersection.value))));
+                    break;
+            }
+
+            if (validIntersections.Count == 0)
+            {
+                return Intersection.NoneArray;
+            }
+            return validIntersections.ToArray();
         }
 
         public override bool Contains(Point3D point)

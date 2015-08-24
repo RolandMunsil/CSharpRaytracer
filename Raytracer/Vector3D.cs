@@ -124,45 +124,6 @@ namespace Raytracer
             return (vector1.x * vector2.x) + (vector1.y * vector2.y) + (vector1.z * vector2.z);
         }
 
-        public void Rotate(double rotationXZ, double rotationYZ)
-        {
-
-
-
-            //todo: optimize the heck out of this function
-
-            if (rotationYZ != 0)
-            {
-                //First do vertical
-                double lengthYZ = Math.Sqrt(y * y + z * z);
-                double angleYZ = Math.Atan2(y, z);
-
-                double newAngle = angleYZ + rotationYZ;
-                this.y = Math.Sin(newAngle) * lengthYZ;
-                this.z = Math.Cos(newAngle) * lengthYZ;
-            }
-
-            if (rotationXZ != 0)
-            {
-                //Now do horizontal
-                double lengthXZ = Math.Sqrt(x * x + z * z);
-                double angleXZ = Math.Atan2(x, z);
-
-                double newAngle = angleXZ + rotationXZ;
-                this.x = Math.Sin(newAngle) * lengthXZ;
-                this.z = Math.Cos(newAngle) * lengthXZ;
-            }
-        }
-
-        public Vector3D Rotated(double rotationXZ, double rotationYZ)
-        {
-            //todo: optimize the heck out of this function
-
-            Vector3D copy = this;
-            copy.Rotate(rotationXZ, rotationYZ);
-            return copy;
-        }
-
         public Vector3D Reflected(Vector3D surfaceNormal)
         {
             Vector3D n = surfaceNormal.Normalized();
@@ -416,7 +377,7 @@ namespace Raytracer
 
         public static Vector3D operator *(double multiplier, Vector3D vector)
         {
-            return new Vector3D(vector.x * multiplier, vector.y * multiplier, vector.z * multiplier);
+            return vector * multiplier;
         }
 
         public static Vector3D operator -(Vector3D vector)
