@@ -9,7 +9,7 @@ namespace Raytracer
     class LightSource
     {
         public Point3D position;
-        public float maxLitDistance;
+        public double maxLitDistance;
         //Color lightColor;
     }
 }

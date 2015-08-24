@@ -12,23 +12,23 @@ namespace Raytracer
         //TODO: should this be precalculated or figured out once object and value is calculated?
         public struct Intersection
         {
-            public float value;
+            public double value;
             public ARGBColor color;
             public Vector3D normal;
 
-            public static readonly Intersection FarthestAway = new Intersection { value = Single.MaxValue };
+            public static readonly Intersection FarthestAway = new Intersection { value = Double.MaxValue };
 
             public static readonly Intersection None = 
                 new Intersection
                 {
-                    value = Single.NaN,
+                    value = Double.NaN,
                     color = (ARGBColor)0xDEADBEEF,
-                    normal = new Vector3D(Single.NaN, Single.NaN, Single.NaN)
+                    normal = new Vector3D(Double.NaN, Double.NaN, Double.NaN)
                 };
 
             public static readonly Intersection[] NoneArray = { };
 
-            public const float MinValue = (1 / 2048f);
+            public const double MinValue = (1 / 2048.0);
 
             public static bool operator ==(Intersection intersection1, Intersection intersection2)
             {
@@ -56,10 +56,10 @@ namespace Raytracer
             }
         }
 
-        public float refractivity = 0;
-        public float reflectivity = 0;
-        public float refractionIndex = 0;
-        public float DiffuseAmount
+        public double refractivity = 0;
+        public double reflectivity = 0;
+        public double refractionIndex = 0;
+        public double DiffuseAmount
         {
             get
             {

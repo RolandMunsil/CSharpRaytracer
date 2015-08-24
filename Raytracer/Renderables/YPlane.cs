@@ -9,10 +9,10 @@ namespace Raytracer
 {
     class YPlane : Renderable
     {
-        float Y;
+        double Y;
         private static readonly Vector3D Normal = new Vector3D(0, 1, 0);
 
-        public YPlane(float y)
+        public YPlane(double y)
         {
             this.Y = y;
             this.reflectivity = 0;
@@ -38,7 +38,7 @@ namespace Raytracer
                 }
             }
 
-            float value = ray.ValueWhenYIs(Y);
+            double value = ray.ValueWhenYIs(Y);
             Point3D point = ray.PointAt(value);
             if (value >= Intersection.MinValue)
             {
@@ -73,7 +73,7 @@ namespace Raytracer
             return point.y == Y;
         }
 
-        private ARGBColor ColorAt(float x, float z)
+        private ARGBColor ColorAt(double x, double z)
         {
             //return x.PMod(20) < 10 ^ z.PMod(20) < 10 ? (ARGBColor)0xFF4A7023 : (ARGBColor)0xFF78AB46;
             return x.PMod(200) < 100 ^ z.PMod(200) < 100 ? (ARGBColor)0xFFFFFFFF : (ARGBColor)0xFF000000;

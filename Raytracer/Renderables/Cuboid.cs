@@ -11,14 +11,14 @@ namespace Raytracer
     {
         ARGBColor color;
 
-        float xLow;
-        float xHigh;
-        float yLow;
-        float yHigh;
-        float zLow;
-        float zHigh;
+        double xLow;
+        double xHigh;
+        double yLow;
+        double yHigh;
+        double zLow;
+        double zHigh;
 
-        public Cuboid(Point3D center, float xSize, float ySize, float zSize, ARGBColor color)
+        public Cuboid(Point3D center, double xSize, double ySize, double zSize, ARGBColor color)
         {
             xLow = center.x - (xSize / 2);
             xHigh = center.x + (xSize / 2);
@@ -36,26 +36,26 @@ namespace Raytracer
         {
             //TODO: I feel like this is kind of terrible.
 
-            List<Tuple<float, int>> coordsToCheck = new List<Tuple<float, int>>(6)
+            List<Tuple<double, int>> coordsToCheck = new List<Tuple<double, int>>(6)
             {
-                new Tuple<float, int>(xLow,   0),
-                new Tuple<float, int>(xHigh,  0),
-                new Tuple<float, int>(yLow,   1),
-                new Tuple<float, int>(yHigh,  1),
-                new Tuple<float, int>(zLow,   2),
-                new Tuple<float, int>(zHigh,  2),
+                new Tuple<double, int>(xLow,   0),
+                new Tuple<double, int>(xHigh,  0),
+                new Tuple<double, int>(yLow,   1),
+                new Tuple<double, int>(yHigh,  1),
+                new Tuple<double, int>(zLow,   2),
+                new Tuple<double, int>(zHigh,  2),
             };
 
             bool valueFound = false;
-            float closestValidValue = Intersection.FarthestAway.value;
+            double closestValidValue = Intersection.FarthestAway.value;
             int normalComponentIndex = -1;
 
             foreach (var tuple in coordsToCheck)
             {
-                float component = tuple.Item1;
+                double component = tuple.Item1;
                 int componentIndex = tuple.Item2;
 
-                float value = ray.ValueWhenComponentIs(component, componentIndex);
+                double value = ray.ValueWhenComponentIs(component, componentIndex);
                 if (value < closestValidValue && value >= Intersection.MinValue)
                 {
                     Point3D pointToCheck = ray.PointAt(value);
@@ -88,24 +88,24 @@ namespace Raytracer
 
         public override Renderable.Intersection[] GetAllIntersections(Ray ray)
         {
-            List<Tuple<float, int>> coordsToCheck = new List<Tuple<float, int>>(6)
+            List<Tuple<double, int>> coordsToCheck = new List<Tuple<double, int>>(6)
             {
-                new Tuple<float, int>(xLow,   0),
-                new Tuple<float, int>(xHigh,  0),
-                new Tuple<float, int>(yLow,   1),
-                new Tuple<float, int>(yHigh,  1),
-                new Tuple<float, int>(zLow,   2),
-                new Tuple<float, int>(zHigh,  2),
+                new Tuple<double, int>(xLow,   0),
+                new Tuple<double, int>(xHigh,  0),
+                new Tuple<double, int>(yLow,   1),
+                new Tuple<double, int>(yHigh,  1),
+                new Tuple<double, int>(zLow,   2),
+                new Tuple<double, int>(zHigh,  2),
             };
 
             List<Intersection> intersections = new List<Intersection>(6);
 
             foreach (var tuple in coordsToCheck)
             {
-                float component = tuple.Item1;
+                double component = tuple.Item1;
                 int componentIndex = tuple.Item2;
 
-                float value = ray.ValueWhenComponentIs(component, componentIndex);
+                double value = ray.ValueWhenComponentIs(component, componentIndex);
                 if (value >= Intersection.MinValue)
                 {
                     Point3D pointToCheck = ray.PointAt(value);

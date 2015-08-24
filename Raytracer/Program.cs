@@ -52,7 +52,7 @@ namespace Raytracer
                         color = niceBlue,
                         reflectivity = 0.6f
                     },
-                    new YPlane(-400.1f)
+                    new YPlane(-400.01f)
                     {
                         reflectivity = .4f,
                     }
@@ -73,11 +73,11 @@ namespace Raytracer
                 },
                 options = new Scene.RenderOptions
                 {
-                    antialiasAmount = 1,
+                    antialiasAmount = 2,
                     parallelRendering = false,
                     lightingEnabled = true,
                     ambientLight = 0.2f,
-                    maxReflections = 0,
+                    maxReflections = 16,
                     maxRefractions = 16,
 
                     imageWidth = 1600,
@@ -85,13 +85,13 @@ namespace Raytracer
 
                     //animationFunction = delegate(int frameCount)
                     //{
-                    //    //float frameCountAdj = (1 + frameCount) / 30f;
+                    //    //double frameCountAdj = (1 + frameCount) / 30f;
 
                     //    frameCount = 1;
 
-                    //    float yPos = (((float)Math.Sin(frameCount / 5f) + 1) / 2) * 1200;
+                    //    double yPos = ((Math.Sin(frameCount / 5f) + 1) / 2) * 1200;
 
-                    //    scene.camera.ChangePositionAndLookingAt(new Point3D(1600 * (float)Math.Cos(frameCount / 4f), yPos, 1600 * (float)Math.Sin(frameCount / 4f)), new Point3D(0, 0, 0));
+                    //    scene.camera.ChangePositionAndLookingAt(new Point3D(1600 * Math.Cos(frameCount / 4f), yPos, 1600 * Math.Sin(frameCount / 4f)), new Point3D(0, 0, 0));
 
                     //    //middleSphere.refractionIndex += .01f;
                     //    //Point3D newCameraPos = new Point3D(0, 80 - frameCount * 5, -80);
@@ -100,7 +100,7 @@ namespace Raytracer
                 }
             };
 
-        public static float airRefractIndex = 1f;
+        public static double airRefractIndex = 1f;
 
         public static void Main(string[] args)
         {
@@ -109,17 +109,6 @@ namespace Raytracer
             using (PixelWindow window = new PixelWindow(scene.options.imageWidth, scene.options.imageHeight, "Raytracing"))
             {
                 bool cameraIsInsideObject = scene.renderedObjects.Any(obj => obj.Contains(scene.camera.position));
-
-                //for (int frame = 1; frame < 32; frame++)
-                //{
-                //double angle = (frame / (double)240) * (Math.PI * 2);
-                //scene.camera = new Camera(new Point3D(107 * (float)Math.Sin(angle), 75, 107 * (float)Math.Cos(angle)), new Point3D(0, 0, 0), Camera.Projection.Perspective)
-                //{
-                //    //put them here instead of in the constructor for clarity
-                //    focalLength = 700,
-                //    zoom = 1
-                //};
-
                 int frameCount = 0;
 
                 do
@@ -197,7 +186,7 @@ namespace Raytracer
             {
                 for (int subY = 0; subY < scene.options.antialiasAmount; subY++)
                 {
-                    Ray ray = scene.camera.RayAtPixel(x + (subX / (float)scene.options.antialiasAmount), y + (subY / (float)scene.options.antialiasAmount), window);
+                    Ray ray = scene.camera.RayAtPixel(x + (subX / (double)scene.options.antialiasAmount), y + (subY / (double)scene.options.antialiasAmount), window);
 
                     //stopWatch.Restart();
                     ARGBColor color = ColorOf(ray, scene.options.maxReflections, scene.options.maxRefractions, cameraIsInsideObject);
@@ -248,7 +237,7 @@ namespace Raytracer
 
             Point3D hitPoint = ray.PointAt(closestIntersection.value);
 
-            float litAmount = 1f;
+            double litAmount = 1f;
             if (scene.options.lightingEnabled)
             {
                 litAmount = scene.options.ambientLight;
@@ -268,7 +257,7 @@ namespace Raytracer
                     {
                         Renderable.Intersection intersection = obj.GetNearestIntersection(rayToLight);
 
-                        //float lightthingdfjadsfl = rayToLight.PointAt(intersection.value).AngleTo(rayToLight.ToVector3D());
+                        //double lightthingdfjadsfl = rayToLight.PointAt(intersection.value).AngleTo(rayToLight.ToVector3D());
 
 
                         if (intersection != Renderable.Intersection.None && intersection.value < 1)
@@ -303,7 +292,7 @@ namespace Raytracer
                 return ARGBColor.Black;
             }
 
-            //TODO: would using a float for each channel have a significant effect? Probably not, but maybe?
+            //TODO: would using a double for each channel have a significant effect? Probably not, but maybe?
             ARGBColor diffuseColor = closestIntersection.color;
             ARGBColor reflectedColor = (ARGBColor)0x00000000;
             ARGBColor refractedColor = (ARGBColor)0x00000000;
@@ -317,8 +306,8 @@ namespace Raytracer
             }
             if (refractionsLeft > 0 && hitObj.refractivity > 0)
             {
-                float refractIndexFrom = rayIsInObject ? hitObj.refractionIndex : airRefractIndex;
-                float refractIndexTo = rayIsInObject ? airRefractIndex : hitObj.refractionIndex;
+                double refractIndexFrom = rayIsInObject ? hitObj.refractionIndex : airRefractIndex;
+                double refractIndexTo = rayIsInObject ? airRefractIndex : hitObj.refractionIndex;
 
                 bool totalInternalReflection;
                 Vector3D refractedVector = ray.Direction.Refracted(closestIntersection.normal, refractIndexFrom, refractIndexTo, out totalInternalReflection);
@@ -335,7 +324,7 @@ namespace Raytracer
             };
         }
 
-        static byte CombineChannels(byte diffuse, byte refracted, byte reflected, Renderable obj, float litAmount)
+        static byte CombineChannels(byte diffuse, byte refracted, byte reflected, Renderable obj, double litAmount)
         {
             //TODO: do some sort of L*a*b* transormation instead of just multiplying it?
             return Math.Min((byte)0xFF, (byte)((diffuse * obj.DiffuseAmount * litAmount) + (refracted * obj.reflectivity * litAmount) + (reflected * obj.refractivity * litAmount)));
@@ -372,7 +361,7 @@ namespace Raytracer
             }
         }
 
-        public static float PMod(this float dividend, float divisor)
+        public static double PMod(this double dividend, double divisor)
         {
             return ((dividend % divisor) + divisor) % divisor;
         }

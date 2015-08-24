@@ -10,11 +10,11 @@ namespace Raytracer
     [DebuggerDisplay("({x}, {y}, {z})")]
     struct Point3D
     {
-        public float x;
-        public float y;
-        public float z;
+        public double x;
+        public double y;
+        public double z;
 
-        public Point3D(float x, float y, float z)
+        public Point3D(double x, double y, double z)
         {
             this.x = x;
             this.y = y;
@@ -22,7 +22,7 @@ namespace Raytracer
         }
 
         //I feel like maybe this is a horrible hacky thing.
-        public float this[int index]
+        public double this[int index]
         {
             get
             {
@@ -64,7 +64,7 @@ namespace Raytracer
             return new Vector3D(left.x - right.x, left.y - right.y, left.z - right.z);
         }
 
-        public static Point3D operator *(Point3D vector, float multiplier)
+        public static Point3D operator *(Point3D vector, double multiplier)
         {
             return new Point3D(vector.x * multiplier, vector.y * multiplier, vector.z * multiplier);
         }

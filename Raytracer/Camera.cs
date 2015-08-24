@@ -17,14 +17,14 @@ namespace Raytracer
         }
 
         public Point3D position;
-        public float facingAngleHoriz;
-        public float facingAngleVert;
+        public double facingAngleHoriz;
+        public double facingAngleVert;
 
         Projection projection;
 
         //todo: figure out more about this. size, camera as plane, camera as point, etc.
-        public float focalLength;
-        public float zoom;
+        public double focalLength;
+        public double zoom;
 
         public Camera(Point3D position, Point3D lookingAt, Projection projection)
         {
@@ -36,11 +36,11 @@ namespace Raytracer
             this.projection = projection;
         }
 
-        public Ray RayAtPixel(float x, float y, PixelWindow window)
+        public Ray RayAtPixel(double x, double y, PixelWindow window)
         {
-            float sortaFov = 1 / focalLength;
-            float adjX = x - (window.ClientWidth / 2f);
-            float adjY = y - (window.ClientHeight / 2f);
+            double sortaFov = 1 / focalLength;
+            double adjX = x - (window.ClientWidth / 2.0);
+            double adjY = y - (window.ClientHeight / 2.0);
 
             adjX /= zoom;
             adjY /= zoom;

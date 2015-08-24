@@ -10,11 +10,11 @@ namespace Raytracer
     class Sphere : Renderable
     {
         Point3D center;
-        float radius;
+        double radius;
 
         public ARGBColor color;
 
-        public Sphere(Point3D center, float radius)
+        public Sphere(Point3D center, double radius)
         {
             this.center = center;
             this.radius = radius;
@@ -45,33 +45,33 @@ namespace Raytracer
             //LinearEquation combinedX = ray.XEquation - center.X;
             //LinearEquation combinedY = ray.YEquation - center.Y;
             //LinearEquation combinedZ = ray.ZEquation - center.Z;
-            float adjXIntercept = ray.Origin.x - center.x;
-            float adjYIntercept = ray.Origin.y - center.y;
-            float adjZIntercept = ray.Origin.z - center.z;
+            double adjXIntercept = ray.Origin.x - center.x;
+            double adjYIntercept = ray.Origin.y - center.y;
+            double adjZIntercept = ray.Origin.z - center.z;
 
             //Optimize these two lines.
             //QuadraticEquation combined = combinedX * combinedX + combinedY * combinedY + combinedZ * combinedZ;
             //combined -= radius * radius;
 
-            float quadCoefficient = ray.Direction.x * ray.Direction.x +
+            double quadCoefficient = ray.Direction.x * ray.Direction.x +
                                     ray.Direction.y * ray.Direction.y +
                                     ray.Direction.z * ray.Direction.z;
 
-            float linearCoefficient = ((ray.Direction.x * adjXIntercept) * 2) +
+            double linearCoefficient = ((ray.Direction.x * adjXIntercept) * 2) +
                                       ((ray.Direction.y * adjYIntercept) * 2) +
                                       ((ray.Direction.z * adjZIntercept) * 2);
 
-            float constant = adjXIntercept * adjXIntercept +
+            double constant = adjXIntercept * adjXIntercept +
                              adjYIntercept * adjYIntercept +
                              adjZIntercept * adjZIntercept -
                              radius * radius;
 
             //Find zeroes using quadratic equation
-            float a = quadCoefficient;
-            float b = linearCoefficient;
-            float c = constant;
+            double a = quadCoefficient;
+            double b = linearCoefficient;
+            double c = constant;
 
-            float numToSqrt = (b * b) - (4 * a * c);
+            double numToSqrt = (b * b) - (4 * a * c);
             if (numToSqrt < 0)
             {
                 return Intersection.NoneArray;
@@ -81,8 +81,8 @@ namespace Raytracer
             {
                 return Intersection.NoneArray;
             }
-            float higherZero = (-b + (float)Math.Sqrt(numToSqrt)) / (2 * a);
-            float lowerZero = (-b - (float)Math.Sqrt(numToSqrt)) / (2 * a);
+            double higherZero = (-b + Math.Sqrt(numToSqrt)) / (2 * a);
+            double lowerZero = (-b - Math.Sqrt(numToSqrt)) / (2 * a);
 
             if (higherZero < Intersection.MinValue && lowerZero < Intersection.MinValue)
             {

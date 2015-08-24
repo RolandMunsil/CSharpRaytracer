@@ -23,7 +23,7 @@ namespace Raytracer
             public int antialiasAmount;
             public bool parallelRendering;
             public bool lightingEnabled;
-            public float ambientLight;
+            public double ambientLight;
             public int maxReflections;
             public int maxRefractions;
             public int imageWidth;

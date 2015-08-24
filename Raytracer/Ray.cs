@@ -38,27 +38,27 @@ namespace Raytracer
         {
         }
 
-        public Point3D PointAt(float t)
+        public Point3D PointAt(double t)
         {
             return origin + (direction * t);
         }
 
-        public float ValueWhenXIs(float x)
+        public double ValueWhenXIs(double x)
         {
             return (x - origin.x) / direction.x;
         }
 
-        public float ValueWhenYIs(float y)
+        public double ValueWhenYIs(double y)
         {
             return (y - origin.y) / direction.y;
         }
 
-        public float ValueWhenZIs(float z)
+        public double ValueWhenZIs(double z)
         {
             return (z - origin.z) / direction.z;
         }
 
-        public float ValueWhenComponentIs(float value, int componentIndex)
+        public double ValueWhenComponentIs(double value, int componentIndex)
         {
             return (value - origin[componentIndex]) / direction[componentIndex];
         }
