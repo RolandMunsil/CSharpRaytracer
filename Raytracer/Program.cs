@@ -20,16 +20,16 @@ namespace Raytracer
 
         static CSGObject coolCubeThing = (new Cuboid(Point3D.Zero, 800, 800, 800, niceBlue)
                                   {
-                                      reflectivity = 0.1f,
+                                      reflectivity = 0.1
                                   } -
-                                  ( new Sphere(new Point3D( 0,      0,    0), 500,                 niceBlue) |
-                                    new Sphere(new Point3D( 400,  400, -400), 192.820323027550917, niceBlue) |
-                                    new Sphere(new Point3D(-400,  400, -400), 192.820323027550917, niceBlue) |
-                                    new Sphere(new Point3D( 400, -400, -400), 192.820323027550917, niceBlue) |
+                                  (new Sphere(new Point3D(0, 0, 0), 500, niceBlue) |
+                                    new Sphere(new Point3D(400, 400, -400), 192.820323027550917, niceBlue) |
+                                    new Sphere(new Point3D(-400, 400, -400), 192.820323027550917, niceBlue) |
+                                    new Sphere(new Point3D(400, -400, -400), 192.820323027550917, niceBlue) |
                                     new Sphere(new Point3D(-400, -400, -400), 192.820323027550917, niceBlue) |
-                                    new Sphere(new Point3D( 400,  400,  400), 192.820323027550917, niceBlue) |
-                                    new Sphere(new Point3D(-400,  400,  400), 192.820323027550917, niceBlue) |
-                                    new Sphere(new Point3D( 400, -400,  400), 192.820323027550917, niceBlue)
+                                    new Sphere(new Point3D(400, 400, 400), 192.820323027550917, niceBlue) |
+                                    new Sphere(new Point3D(-400, 400, 400), 192.820323027550917, niceBlue) |
+                                    new Sphere(new Point3D(400, -400, 400), 192.820323027550917, niceBlue)
                                   ));
 
         static YPlane plane = new YPlane(-400.01f)
@@ -37,7 +37,7 @@ namespace Raytracer
             reflectivity = .7f,
         };
 
-        static Sphere regularSphere = new Sphere(Point3D.Zero, 700, niceGreen);
+        static Sphere regularSphere = new Sphere(Point3D.Zero, 400, niceGreen);
 
         static Scene scene = new Scene
             {
@@ -45,7 +45,7 @@ namespace Raytracer
                 renderedObjects = new Renderable[]
                 {
                     coolCubeThing,
-                    //regularSphere,
+                    regularSphere,
                     plane
                 },
                 lightSources = new LightSource[]
@@ -68,26 +68,21 @@ namespace Raytracer
                     parallelRendering = true,
                     lightingEnabled = true,
                     ambientLight = 0.5f,
-                    maxReflections = 1,
+                    maxReflections = 16,
                     maxRefractions = 16,
 
                     imageWidth = 1600,
                     imageHeight = 900,
 
-                    //animationFunction = delegate(int frameCount)
-                    //{
-                    //    //double frameCountAdj = (1 + frameCount) / 30f;
+                    animationFunction = delegate(int frameCount)
+                    {
 
-                    //    //frameCount = 1;
+                        //double angle = (Math.PI * 2) * (frameCount / (double)(10.0 * 30));
+                        //scene.camera.ChangePositionAndLookingAt(new Point3D(1700 * Math.Cos(angle), 900, 1700 * Math.Sin(angle)), new Point3D(0, 0, 0));
 
-                    //    double angle = (Math.PI * 2) * (frameCount / (double)(10.0 * 30));
-
-                    //    scene.camera.ChangePositionAndLookingAt(new Point3D(1700 * Math.Cos(angle), 900, 1700 * Math.Sin(angle)), new Point3D(0, 0, 0));
-
-                    //    //middleSphere.refractionIndex += .01f;
-                    //    //Point3D newCameraPos = new Point3D(0, 80 - frameCount * 5, -80);
-                    //    //scene.camera.ChangePositionAndLookingAt(newCameraPos, new Point3D(0, 0, 0));
-                    //}
+                        //double angle = (Math.PI * 2) * (frameCount / 10.0);
+                        //scene.camera.ChangePositionAndLookingAt(new Point3D(0, Math.Sin(angle) * 1600, Math.Cos(angle) * 1600), new Point3D(0, 0, 0));
+                    }
                 }
             };
 
@@ -240,11 +235,12 @@ namespace Raytracer
 
             Point3D hitPoint = ray.PointAt(closestIntersection.value);
 
-            double litAmount = 1f;
+
+            double ambientLight = scene.options.ambientLight;
+            double lambertianShadingLight = 0;
+
             if (scene.options.lightingEnabled)
             {
-                litAmount = scene.options.ambientLight;
-
                 foreach (LightSource source in scene.lightSources)
                 {
                     Vector3D vecToLight = (source.position - hitPoint);
@@ -259,38 +255,39 @@ namespace Raytracer
                     foreach (Renderable obj in scene.renderedObjects)
                     {
                         Renderable.Intersection intersection = obj.GetNearestIntersection(rayToLight);
-
-                        //double lightthingdfjadsfl = rayToLight.PointAt(intersection.value).AngleTo(rayToLight.ToVector3D());
-
-
-                        if (intersection != Renderable.Intersection.None && intersection.value < 1)
+                        if (intersection != Renderable.Intersection.None && intersection.value <= 1)
                         {
                             lightIsBlocked = true;
                             break;
                         }
                     }
-
                     if (lightIsBlocked)
                     {
                         //No light from this light source
                         continue;
                     }
-                    else
-                    {
-                        //Less light farther away
-                        litAmount += 1f - (vecToLight.Length / source.maxLitDistance);
 
-                        if (litAmount >= 1f) //Can't get any brighter
-                        {
-                            litAmount = 1f;
-                            break;
-                        }
+                    Vector3D n = closestIntersection.normal.Normalized();
+                    Vector3D l = vecToLight.Normalized();
+
+                    if (l.AngleTo(n) > Math.PI / 2)
+                    {
+                        n = -n;
                     }
+
+                    lambertianShadingLight = Math.Max(0, Vector3D.DotProduct(n, l));
+
+                    //Less light farther away
+                    double distFrac = (vecToLight.Length / source.maxLitDistance);
+                    double multiplier = Math.Min(1, 1f - (distFrac * distFrac));
+                    lambertianShadingLight *= multiplier;
                 }
             }
 
+            double totalLight = Math.Min(1, ambientLight + lambertianShadingLight);
+
             //if litAmount is less than 1/255 the color will always end up being black anyway.
-            if (litAmount < (1 / 255f))
+            if (totalLight < (1 / 255f))
             {
                 return ARGBColor.Black;
             }
@@ -320,9 +317,9 @@ namespace Raytracer
 
             return new ARGBColor
             {
-                red = CombineChannels(diffuseColor.red, reflectedColor.red, refractedColor.red, hitObj, litAmount),
-                green = CombineChannels(diffuseColor.green, reflectedColor.green, refractedColor.green, hitObj, litAmount),
-                blue = CombineChannels(diffuseColor.blue, reflectedColor.blue, refractedColor.blue, hitObj, litAmount),
+                red = CombineChannels(diffuseColor.red, reflectedColor.red, refractedColor.red, hitObj, totalLight),
+                green = CombineChannels(diffuseColor.green, reflectedColor.green, refractedColor.green, hitObj, totalLight),
+                blue = CombineChannels(diffuseColor.blue, reflectedColor.blue, refractedColor.blue, hitObj, totalLight),
                 reserved = 0
             };
         }
