@@ -124,32 +124,71 @@ namespace Raytracer
             return (vector1.x * vector2.x) + (vector1.y * vector2.y) + (vector1.z * vector2.z);
         }
 
-        public Vector3D Reflected(Vector3D surfaceNormal)
+        public static Vector3D CrossProduct(Vector3D v1, Vector3D v2)
         {
-            Vector3D n = surfaceNormal.Normalized();
-            Vector3D l = this.Normalized();
+            Vector3D v = new Vector3D(
+                v1.y * v2.z - v2.y * v1.z,
+                v1.z * v2.x - v2.z * v1.x,
+                v1.x * v2.y - v2.x * v1.y
+                );
 
-            double cosθ1 = DotProduct(-n, l);
-            if (cosθ1 <= 0)
+            if (v.Length > .000000001)
             {
-                n = -n;
-                cosθ1 = DotProduct(-n, l);
-            }
-            else
-            {
-                if (DotProduct(n, l) > 0)
+                if (Math.Abs(v.AngleTo(v1) - (Math.PI / 2)) > .0001)
+                {
+                    Debugger.Break();
+                }
+                if (Math.Abs(v.AngleTo(v2) - (Math.PI / 2)) > .0001)
                 {
                     Debugger.Break();
                 }
             }
 
-            return l + 2 * cosθ1 * n;
+            return v;
+        }
 
-            //Vector3D normalizedNormal = surfaceNormal.Normalized();
-            //double dotProduct = DotProduct(this, normalizedNormal);
-            //Vector3D dunno = (normalizedNormal * 2) * dotProduct;
+        public Vector3D Reflected(Vector3D surfaceNormal)
+        {
+            //Vector3D n = surfaceNormal.Normalized();
+            //Vector3D l = this.Normalized();
 
-            //return this - dunno;
+            //double cosθ1 = DotProduct(-n, l);
+            //if (cosθ1 <= 0)
+            //{
+            //    n = -n;
+            //    cosθ1 = DotProduct(-n, l);
+            //}
+            //else
+            //{
+            //    if (DotProduct(n, l) > 0)
+            //    {
+            //        Debugger.Break();
+            //    }
+            //}
+
+            //return l + 2 * cosθ1 * n;
+
+            Vector3D normalizedNormal = surfaceNormal.Normalized();
+            double dotProduct = DotProduct(this, normalizedNormal);
+            Vector3D dunno = (normalizedNormal * 2) * dotProduct;
+
+            Vector3D answer = this - dunno;
+
+            if (Math.Abs(answer.AngleTo(normalizedNormal) - ((-this).AngleTo(normalizedNormal))) > .0001)
+            {
+                var a = answer.AngleTo(normalizedNormal);
+                var b = (-this).AngleTo(normalizedNormal);
+                Debugger.Break();
+            }
+
+            if ((CrossProduct(-this, normalizedNormal).Normalized() - CrossProduct(normalizedNormal, answer).Normalized()).Length > .0001)
+            {
+                var a = CrossProduct(-this, normalizedNormal).Normalized();
+                var b = CrossProduct(normalizedNormal, answer).Normalized();
+                Debugger.Break();
+            }
+
+            return answer;
         }
 
         //Alright so clearly something else is causing the problem. The refraction equation is correct but something else is screwing it up.
@@ -283,6 +322,17 @@ namespace Raytracer
             if (Math.Abs(inSnell - outSnell) > 0.01)
             {
                 Debugger.Break();
+            }
+
+            if ((CrossProduct(-l, n).Normalized() - CrossProduct(n, vrefract).Normalized()).Length > .0001)
+            {
+                var a = CrossProduct(-l, n);
+                var b = CrossProduct(n, vrefract);
+
+                if (a.Length > .00001 || b.Length > .00001)
+                {
+                    Debugger.Break();
+                }
             }
 
 

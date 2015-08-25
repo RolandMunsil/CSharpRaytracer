@@ -41,14 +41,13 @@ namespace Raytracer
 
         public Ray RayAtPixel(double x, double y, PixelWindow window)
         {
-            double sortaFov = 1 / focalLength;
             double adjX = x - (window.ClientWidth / 2.0);
             double adjY = y - (window.ClientHeight / 2.0);
 
-            adjX /= zoom;
-            adjY /= zoom;
+            adjX /= zoom * focalLength;
+            adjY /= zoom * focalLength;
 
-            Vector3D direction = new Vector3D(adjX * sortaFov, adjY * sortaFov, 1);
+            Vector3D direction = new Vector3D(adjX, adjY, 1);
             //direction.Rotate(facingAngleHoriz, facingAngleVert);
             return new Ray(position, rotationMatrix * direction);
         }

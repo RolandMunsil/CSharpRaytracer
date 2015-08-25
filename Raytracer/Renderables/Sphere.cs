@@ -9,8 +9,8 @@ namespace Raytracer
 {
     class Sphere : Renderable
     {
-        Point3D center;
-        double radius;
+        public Point3D center;
+        public double radius;
 
         public ARGBColor color;
 
