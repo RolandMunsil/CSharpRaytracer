@@ -54,16 +54,15 @@
     <Compile Include="Renderables\YPlane.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="PixelWindowCSharp">
-      <HintPath>..\..\PixelWindow\Release\PixelWindowCSharp.dll</HintPath>
+    <Reference Include="PixelWindowSDL">
+      <HintPath>Externals\PixelWindowSDL.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "..\..\..\..\PixelWindow\Release\PixelWindow.dll" "$(TargetDir)"
-copy /Y "..\..\..\..\PixelWindow\Release\PixelWindow.pdb" "$(TargetDir)"</PostBuildEvent>
+    <PostBuildEvent>xcopy /y /d  "$(ProjectDir)Externals\*.dll" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

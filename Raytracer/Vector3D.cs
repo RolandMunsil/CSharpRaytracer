@@ -132,17 +132,17 @@ namespace Raytracer
                 v1.x * v2.y - v2.x * v1.y
                 );
 
-            if (v.Length > .000000001)
-            {
-                if (Math.Abs(v.AngleTo(v1) - (Math.PI / 2)) > .0001)
-                {
-                    Debugger.Break();
-                }
-                if (Math.Abs(v.AngleTo(v2) - (Math.PI / 2)) > .0001)
-                {
-                    Debugger.Break();
-                }
-            }
+            //if (v.Length > .000000001)
+            //{
+            //    if (Math.Abs(v.AngleTo(v1) - (Math.PI / 2)) > .0001)
+            //    {
+            //        Debugger.Break();
+            //    }
+            //    if (Math.Abs(v.AngleTo(v2) - (Math.PI / 2)) > .0001)
+            //    {
+            //        Debugger.Break();
+            //    }
+            //}
 
             return v;
         }
@@ -174,19 +174,19 @@ namespace Raytracer
 
             Vector3D answer = this - dunno;
 
-            if (Math.Abs(answer.AngleTo(normalizedNormal) - ((-this).AngleTo(normalizedNormal))) > .0001)
-            {
-                var a = answer.AngleTo(normalizedNormal);
-                var b = (-this).AngleTo(normalizedNormal);
-                Debugger.Break();
-            }
+            //if (Math.Abs(answer.AngleTo(normalizedNormal) - ((-this).AngleTo(normalizedNormal))) > .0001)
+            //{
+            //    var a = answer.AngleTo(normalizedNormal);
+            //    var b = (-this).AngleTo(normalizedNormal);
+            //    Debugger.Break();
+            //}
 
-            if ((CrossProduct(-this, normalizedNormal).Normalized() - CrossProduct(normalizedNormal, answer).Normalized()).Length > .0001)
-            {
-                var a = CrossProduct(-this, normalizedNormal).Normalized();
-                var b = CrossProduct(normalizedNormal, answer).Normalized();
-                Debugger.Break();
-            }
+            //if ((CrossProduct(-this, normalizedNormal).Normalized() - CrossProduct(normalizedNormal, answer).Normalized()).Length > .0001)
+            //{
+            //    var a = CrossProduct(-this, normalizedNormal).Normalized();
+            //    var b = CrossProduct(normalizedNormal, answer).Normalized();
+            //    Debugger.Break();
+            //}
 
             return answer;
         }
@@ -290,19 +290,19 @@ namespace Raytracer
             Vector3D n = surfaceNormal.Normalized();
             Vector3D l = this.Normalized();
 
-            double cosθ1 = DotProduct(-n, l);
+            double cosθ1 = Math.Min(1, DotProduct(-n, l)); //Min for rounding errors
             if (cosθ1 <= 0)
             {
                 n = -n;
                 cosθ1 = DotProduct(-n, l);
             }
-            else
-            {
-                if (DotProduct(n, l) > 0)
-                {
-                    Debugger.Break();
-                }
-            }
+            //else
+            //{
+            //    if (DotProduct(n, l) > 0)
+            //    {
+            //        Debugger.Break();
+            //    }
+            //}
 
             double sinθ2 = (n1 / n2) * Math.Sqrt(1 - (cosθ1 * cosθ1));
 
@@ -317,23 +317,23 @@ namespace Raytracer
             totalInternalReflection = false;
 
 
-            double inSnell = n1 * Math.Sin(AngleBetween(n, -l));
-            double outSnell = n2 * Math.Sin(AngleBetween(n, -vrefract));
-            if (Math.Abs(inSnell - outSnell) > 0.01)
-            {
-                Debugger.Break();
-            }
+            //double inSnell = n1 * Math.Sin(AngleBetween(n, -l));
+            //double outSnell = n2 * Math.Sin(AngleBetween(n, -vrefract));
+            //if (Math.Abs(inSnell - outSnell) > 0.01)
+            //{
+            //    Debugger.Break();
+            //}
 
-            if ((CrossProduct(-l, n).Normalized() - CrossProduct(n, vrefract).Normalized()).Length > .0001)
-            {
-                var a = CrossProduct(-l, n);
-                var b = CrossProduct(n, vrefract);
+            //if ((CrossProduct(-l, n).Normalized() - CrossProduct(n, vrefract).Normalized()).Length > .0001)
+            //{
+            //    var a = CrossProduct(-l, n);
+            //    var b = CrossProduct(n, vrefract);
 
-                if (a.Length > .00001 || b.Length > .00001)
-                {
-                    Debugger.Break();
-                }
-            }
+            //    if (a.Length > .00001 || b.Length > .00001)
+            //    {
+            //        Debugger.Break();
+            //    }
+            //}
 
 
             return vrefract;

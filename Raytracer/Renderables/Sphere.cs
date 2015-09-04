@@ -1,4 +1,4 @@
-﻿using PixelWindowCSharp;
+﻿using PixelWindowSDL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +12,9 @@ namespace Raytracer
         public Point3D center;
         public double radius;
 
-        public ARGBColor color;
+        public Color color;
 
-        public Sphere(Point3D center, double radius, ARGBColor color)
+        public Sphere(Point3D center, double radius, Color color)
         {
             this.center = center;
             this.radius = radius;
@@ -24,7 +24,7 @@ namespace Raytracer
             //reflectionAmount = .6f;
             //refractionAmount = 0;
             //refractionIndex = 0;
-            //color = (ARGBColor)0xFF91D9D1;
+            //color = (Color)0x91D9D1;
         }
 
         public override Intersection GetNearestIntersection(Ray ray)

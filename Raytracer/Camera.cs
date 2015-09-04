@@ -1,6 +1,7 @@
-﻿using PixelWindowCSharp;
+﻿using PixelWindowSDL;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,26 +10,16 @@ namespace Raytracer
 {
     class Camera
     {
-        public enum Projection
-        {
-            //TODO: implement orthographic projection
-            Orthographic,
-            Perspective,
-        }
-
         public Point3D position;
         //public double facingAngleHoriz;
         //public double facingAngleVert;
 
         Matrix3x3 rotationMatrix;
 
-        Projection projection;
-
         //todo: figure out more about this. size, camera as plane, camera as point, etc.
-        public double focalLength;
         public double zoom;
 
-        public Camera(Point3D position, Point3D lookingAt, Projection projection)
+        public Camera(Point3D position, Point3D lookingAt)
         {
             this.position = position;
             Vector3D direction = lookingAt - position;
@@ -36,7 +27,6 @@ namespace Raytracer
             //facingAngleVert = direction.AngleFromHorizontalPlane;
 
             rotationMatrix = Matrix3x3.RotationAboutYAxis(direction.AngleXZ) * Matrix3x3.RotationAboutXAxis(direction.AngleFromHorizontalPlane);
-            this.projection = projection;
         }
 
         public Ray RayAtPixel(double x, double y, PixelWindow window)
@@ -44,10 +34,17 @@ namespace Raytracer
             double adjX = x - (window.ClientWidth / 2.0);
             double adjY = y - (window.ClientHeight / 2.0);
 
-            adjX /= zoom * focalLength;
-            adjY /= zoom * focalLength;
-
+            adjX /= zoom;
+            adjY /= zoom;
             Vector3D direction = new Vector3D(adjX, adjY, 1);
+
+            //Vector3D direction = new Vector3D(0, 0, 1);
+
+            //double angleX = (adjY / (window.ClientHeight / 2.0)) * (Math.PI / 4) * (900.0/1600.0);
+            //double angleY = (adjX / (window.ClientWidth / 2.0)) * (Math.PI / 4);
+
+            //direction = (Matrix3x3.RotationAboutYAxis(angleY) * Matrix3x3.RotationAboutXAxis(angleX)) * direction;
+
             //direction.Rotate(facingAngleHoriz, facingAngleVert);
             return new Ray(position, rotationMatrix * direction);
         }

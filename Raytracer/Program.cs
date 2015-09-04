@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PixelWindowCSharp;
+using PixelWindowSDL;
 using System.Diagnostics;
 using System.Threading;
 using System.IO;
@@ -12,15 +12,16 @@ namespace Raytracer
 {
     static class Program
     {
-        static ARGBColor niceBlue =   new ARGBColor(26, 128, 255);
-        static ARGBColor niceYellow = new ARGBColor(255, 240, 26);
-        static ARGBColor niceRed =    new ARGBColor(255, 76, 26);
-        static ARGBColor niceGreen =  new ARGBColor(76, 255, 26);
-        static ARGBColor goodGray =   new ARGBColor(196, 196, 196);
+        static Color niceBlue =   new Color(26, 128, 255);
+        static Color niceYellow = new Color(255, 240, 26);
+        static Color niceRed =    new Color(255, 76, 26);
+        static Color niceGreen =  new Color(76, 255, 26);
+        static Color goodGray =   new Color(196, 196, 196);
 
         static CSGObject coolCubeThing = (new Cuboid(Point3D.Zero, 800, 800, 800, niceBlue)
                                   {
-                                      reflectivity = 0.1
+                                      refractivity = 0.9,
+                                      refractionIndex = 2
                                   } -
                                   (new Sphere(new Point3D(0, 0, 0), 500, niceBlue) |
                                     new Sphere(new Point3D(400, 400, -400), 192.820323027550917, niceBlue) |
@@ -37,15 +38,26 @@ namespace Raytracer
             reflectivity = .7f,
         };
 
-        static Sphere regularSphere = new Sphere(Point3D.Zero, 400, niceGreen);
+        static Sphere regularSphere = new Sphere(Point3D.Zero, 400, goodGray) { refractivity = 1, refractionIndex = 1.6};
+        static Sphere slightlySmallerSphere = new Sphere(Point3D.Zero, 390, niceGreen) { refractivity = 0.99, refractionIndex = 1.5 };
+
+        static Cuboid cube1 = new Cuboid(new Point3D(-900, -200, 0), 400, 400, 400, Color.Red);
+        static Cuboid cube2 = new Cuboid(new Point3D(100, 100, -350), 200, 200, 200, Color.Blue);
+
+        static Sphere sphere2 = new Sphere(new Point3D(800, -100, 600), 300, new Color(255, 255, 0));
+        static Sphere shinySphere = new Sphere(new Point3D(600, -300, -600), 100, (Color)0x545454) { reflectivity = 0.7 };
 
         static Scene scene = new Scene
             {
-                skyColor = new ARGBColor(154, 206, 235),
+                skyColor = new Color(154, 206, 235),
                 renderedObjects = new Renderable[]
                 {
-                    coolCubeThing,
+                    //coolCubeThing,
                     regularSphere,
+                    cube1,
+                    cube2,
+                    sphere2,
+                    shinySphere,
                     plane
                 },
                 lightSources = new LightSource[]
@@ -56,18 +68,17 @@ namespace Raytracer
                         maxLitDistance = 3000
                     }
                 },
-                camera = new Camera(new Point3D(500, 900, -1600), new Point3D(0, 0, 0), Camera.Projection.Perspective)
+                camera = new Camera(new Point3D(500, 900, -1600), new Point3D(0, 0, 0))
                 {
                     //put them here instead of in the constructor for clarity
-                    focalLength = 100,
-                    zoom = 10f
+                    zoom = 1300
                 },
                 options = new Scene.RenderOptions
                 {
                     antialiasAmount = 1,
-                    parallelRendering = true,
+                    parallelRendering = false,
                     lightingEnabled = true,
-                    ambientLight = 0.5f,
+                    ambientLight = 0.7f,
                     maxReflections = 16,
                     maxRefractions = 16,
 
@@ -76,9 +87,8 @@ namespace Raytracer
 
                     animationFunction = delegate(int frameCount)
                     {
-
-                        //double angle = (Math.PI * 2) * (frameCount / (double)(10.0 * 30));
-                        //scene.camera.ChangePositionAndLookingAt(new Point3D(1700 * Math.Cos(angle), 900, 1700 * Math.Sin(angle)), new Point3D(0, 0, 0));
+                        double angle = (Math.PI * 2) * (frameCount / (double)(10 * 30));
+                        scene.camera.ChangePositionAndLookingAt(new Point3D(1700 * Math.Sin(angle), 900, 1700 * -Math.Cos(angle)), new Point3D(0, 0, 0));
 
                         //double angle = (Math.PI * 2) * (frameCount / 10.0);
                         //scene.camera.ChangePositionAndLookingAt(new Point3D(0, Math.Sin(angle) * 1600, Math.Cos(angle) * 1600), new Point3D(0, 0, 0));
@@ -90,9 +100,9 @@ namespace Raytracer
 
         public static void Main(string[] args)
         {
-            //Directory.CreateDirectory("images");
+            //Directory.CreateDirectory("images5");
 
-            using (PixelWindow window = new PixelWindow(scene.options.imageWidth, scene.options.imageHeight, "Raytracing"))
+            using (PixelWindow window = new PixelWindow(scene.options.imageWidth, scene.options.imageHeight, true))
             {
                 bool cameraIsInsideObject = scene.renderedObjects.Any(obj => obj.Contains(scene.camera.position));
                 int frameCount = 0;
@@ -113,8 +123,8 @@ namespace Raytracer
                     {
                         Parallel.For(0, window.ClientWidth, delegate(int x, ParallelLoopState xState)
                         {
-                            if (window.IsClosed)
-                                xState.Stop();
+                            //if (window.IsClosed)
+                            //    xState.Stop();
 
                             for (int y = 0; y < window.ClientHeight; y++)
                             {
@@ -122,13 +132,13 @@ namespace Raytracer
                             }
 
                             //I realize the increment isn't thread safe but I figure it's not that important that it is - these updates are purely to make the render less boring to watch
-                            if (++verticalLinesRendered % 64 == 0)
-                            {
-                                lock (window)
-                                {
-                                    window.UpdateClient();
-                                }
-                            }
+                            //if (++verticalLinesRendered % 64 == 0)
+                            //{
+                            //    lock (window)
+                            //    {
+                            //        window.UpdateClient();
+                            //    }
+                            //}
                         });
                     }
                     else
@@ -140,7 +150,7 @@ namespace Raytracer
                                 window[x, y] = CalculatePixelColor(x, y, window, cameraIsInsideObject);
                             }
 
-                            if (++verticalLinesRendered % 64 == 0)
+                            if (++verticalLinesRendered % 16 == 0)
                             {
                                 window.UpdateClient();
                             }
@@ -151,25 +161,25 @@ namespace Raytracer
 
                     window.UpdateClient();
 
-                    //ffmpeg -f image2 -framerate 30 -i %03d.png -vcodec libx264 foo.avi
-                    //window.BackBuffer.Save("images/" + frameCount.ToString("000") + ".png");
+                    //ffmpeg -f image2 -framerate 30 -loop 1 -t 00:00:20 -i images4/%03d.png -vcodec libx264 -crf 0 images4.avi
+                    //window.BackBuffer.Save("../../../Renders/images5/" + frameCount.ToString("000") + ".png");
 
                     //if (frameCount == 300)
                     //{
-                    //    break;
+                    //    return;
                     //}
 
                 } while (scene.options.animationFunction != null);
 
-                while (!window.IsClosed);
+                //while (!window.IsClosed);
             }
         }
 
-        private static ARGBColor CalculatePixelColor(int x, int y, PixelWindow window, bool cameraIsInsideObject)
+        private static Color CalculatePixelColor(int x, int y, PixelWindow window, bool cameraIsInsideObject)
         {
             if (x == 800 && y == 456)
             {
-                //return ARGBColor.Red;
+                //return Color.Red;
                 //Debugger.Break();
             }
 
@@ -187,7 +197,7 @@ namespace Raytracer
                     Ray ray = scene.camera.RayAtPixel(x + (subX / (double)scene.options.antialiasAmount), y + (subY / (double)scene.options.antialiasAmount), window);
 
                     //stopWatch.Restart();
-                    ARGBColor color = ColorOf(ray, scene.options.maxReflections, scene.options.maxRefractions, cameraIsInsideObject);
+                    Color color = ColorOf(ray, scene.options.maxReflections, scene.options.maxRefractions, cameraIsInsideObject);
                     //stopWatch.Stop();
                     //checked { totalColorCalcTime += stopWatch.ElapsedTicks; }
                     rSum += color.red;
@@ -198,12 +208,11 @@ namespace Raytracer
 
             //long avgTime = (totalColorCalcTime * 2 / (scene.options.antialiasAmount * scene.options.antialiasAmount));
 
-            ARGBColor combined = new ARGBColor
+            Color combined = new Color
             {
                 red = (byte)(rSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
                 green = (byte)(gSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
                 blue = (byte)(bSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
-                reserved = 0
             };
             //{
             //    red = (byte)avgTime,
@@ -213,7 +222,7 @@ namespace Raytracer
             return combined;
         }
 
-        static ARGBColor ColorOf(Ray ray, int reflectionsLeft, int refractionsLeft, bool rayIsInObject)
+        static Color ColorOf(Ray ray, int reflectionsLeft, int refractionsLeft, bool rayIsInObject)
         {
             Renderable.Intersection closestIntersection = Renderable.Intersection.FarthestAway;
             Renderable hitObj = null;
@@ -230,17 +239,19 @@ namespace Raytracer
             if(hitObj == null)
             {
                 //No hit
-                return scene.options.lightingEnabled ? (ARGBColor)0x00000000 : scene.skyColor;
+                return scene.options.lightingEnabled ? Color.Black : scene.skyColor;
             }
 
             Point3D hitPoint = ray.PointAt(closestIntersection.value);
 
 
-            double ambientLight = scene.options.ambientLight;
-            double lambertianShadingLight = 0;
+            double totalLight;
 
             if (scene.options.lightingEnabled)
             {
+                double ambientLight = scene.options.ambientLight;
+                double lambertianShadingLight = 0;
+
                 foreach (LightSource source in scene.lightSources)
                 {
                     Vector3D vecToLight = (source.position - hitPoint);
@@ -251,21 +262,22 @@ namespace Raytracer
                     }
                     Ray rayToLight = new Ray(hitPoint, vecToLight);
 
-                    bool lightIsBlocked = false;
+                    //bool lightIsBlocked = false;
+                    double lightLetThroughAmount = 1;
                     foreach (Renderable obj in scene.renderedObjects)
                     {
                         Renderable.Intersection intersection = obj.GetNearestIntersection(rayToLight);
                         if (intersection != Renderable.Intersection.None && intersection.value <= 1)
                         {
-                            lightIsBlocked = true;
-                            break;
+                            lightLetThroughAmount *= obj.refractivity;
+                            //lightIsBlocked = true;
                         }
                     }
-                    if (lightIsBlocked)
-                    {
-                        //No light from this light source
-                        continue;
-                    }
+                    //if (lightIsBlocked)
+                    //{
+                    //    //No light from this light source
+                    //    continue;
+                    //}
 
                     Vector3D n = closestIntersection.normal.Normalized();
                     Vector3D l = vecToLight.Normalized();
@@ -275,27 +287,31 @@ namespace Raytracer
                         n = -n;
                     }
 
-                    lambertianShadingLight = Math.Max(0, Vector3D.DotProduct(n, l));
+                    lambertianShadingLight = (1 - scene.options.ambientLight) * Math.Max(0, Vector3D.DotProduct(n, l));
 
                     //Less light farther away
                     double distFrac = (vecToLight.Length / source.maxLitDistance);
                     double multiplier = Math.Min(1, 1f - (distFrac * distFrac));
                     lambertianShadingLight *= multiplier;
+                    lambertianShadingLight *= lightLetThroughAmount;
                 }
+                totalLight = Math.Min(1, ambientLight + lambertianShadingLight);
             }
-
-            double totalLight = Math.Min(1, ambientLight + lambertianShadingLight);
+            else
+            {
+                totalLight = 1;
+            }
 
             //if litAmount is less than 1/255 the color will always end up being black anyway.
             if (totalLight < (1 / 255f))
             {
-                return ARGBColor.Black;
+                return Color.Black;
             }
 
             //TODO: would using a double for each channel have a significant effect? Probably not, but maybe?
-            ARGBColor diffuseColor = closestIntersection.color;
-            ARGBColor reflectedColor = (ARGBColor)0x00000000;
-            ARGBColor refractedColor = (ARGBColor)0x00000000;
+            Color diffuseColor = closestIntersection.color;
+            Color reflectedColor = Color.Black;
+            Color refractedColor = Color.Black;
 
             if (reflectionsLeft > 0 && hitObj.reflectivity > 0)
             {
@@ -315,19 +331,18 @@ namespace Raytracer
                 refractedColor = ColorOf(refractedRay, reflectionsLeft, --refractionsLeft, (!rayIsInObject) ^ totalInternalReflection);
             }
 
-            return new ARGBColor
+            return new Color
             {
                 red = CombineChannels(diffuseColor.red, reflectedColor.red, refractedColor.red, hitObj, totalLight),
                 green = CombineChannels(diffuseColor.green, reflectedColor.green, refractedColor.green, hitObj, totalLight),
                 blue = CombineChannels(diffuseColor.blue, reflectedColor.blue, refractedColor.blue, hitObj, totalLight),
-                reserved = 0
             };
         }
 
-        static byte CombineChannels(byte diffuse, byte refracted, byte reflected, Renderable obj, double litAmount)
+        static byte CombineChannels(byte diffuse, byte reflected, byte refracted, Renderable obj, double litAmount)
         {
             //TODO: do some sort of L*a*b* transormation instead of just multiplying it?
-            return Math.Min((byte)0xFF, (byte)((diffuse * obj.DiffuseAmount * litAmount) + (refracted * obj.reflectivity * litAmount) + (reflected * obj.refractivity * litAmount)));
+            return Math.Min((byte)0xFF, (byte)((diffuse * obj.DiffuseAmount * litAmount) + (reflected * obj.reflectivity * litAmount) + (refracted * obj.refractivity * litAmount)));
         }
 
         public static Renderable.Intersection Nearest(this IList<Renderable.Intersection> intersections)

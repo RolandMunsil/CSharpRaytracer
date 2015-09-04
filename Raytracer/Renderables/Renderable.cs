@@ -1,4 +1,4 @@
-﻿using PixelWindowCSharp;
+﻿using PixelWindowSDL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ namespace Raytracer
         public struct Intersection
         {
             public double value;
-            public ARGBColor color;
+            public Color color;
             public Vector3D normal;
 
             public static readonly Intersection FarthestAway = new Intersection { value = Double.MaxValue };
@@ -21,7 +21,7 @@ namespace Raytracer
                 new Intersection
                 {
                     value = Double.NaN,
-                    color = (ARGBColor)0xDEADBEEF,
+                    color = (Color)0xDEDBEF,
                     normal = new Vector3D(Double.NaN, Double.NaN, Double.NaN)
                 };
 

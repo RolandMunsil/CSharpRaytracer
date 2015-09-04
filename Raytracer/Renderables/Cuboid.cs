@@ -1,4 +1,4 @@
-﻿using PixelWindowCSharp;
+﻿using PixelWindowSDL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace Raytracer
 {
     class Cuboid : Renderable
     {
-        ARGBColor color;
+        Color color;
 
         double xLow;
         double xHigh;
@@ -18,9 +18,9 @@ namespace Raytracer
         double zLow;
         double zHigh;
 
-        List<Tuple<double, int>> coordsToCheck;
+        Tuple<double, int>[] coordsToCheck;
 
-        public Cuboid(Point3D center, double xSize, double ySize, double zSize, ARGBColor color)
+        public Cuboid(Point3D center, double xSize, double ySize, double zSize, Color color)
         {
             xLow = center.x - (xSize / 2);
             xHigh = center.x + (xSize / 2);
@@ -34,7 +34,7 @@ namespace Raytracer
             this.color = color;
 
 
-            coordsToCheck = new List<Tuple<double, int>>(6)
+            coordsToCheck = new Tuple<double, int>[6]
             {
                 new Tuple<double, int>(xLow,   0),
                 new Tuple<double, int>(xHigh,  0),
@@ -49,23 +49,23 @@ namespace Raytracer
         {
             //TODO: I feel like this is kind of terrible.
             bool valueFound = false;
-            double closestValidValue = Intersection.FarthestAway.value;
+            double closestValue = Intersection.FarthestAway.value;
             int normalComponentIndex = -1;
 
-            foreach (var tuple in coordsToCheck)
+            for(int i = 0; i < 6; i++)
             {
-                double component = tuple.Item1;
-                int componentIndex = tuple.Item2;
+                double component = coordsToCheck[i].Item1;
+                int componentIndex = coordsToCheck[i].Item2;
 
                 double value = ray.ValueWhenComponentIs(component, componentIndex);
-                if (value < closestValidValue && value >= Intersection.MinValue)
+                if (value < closestValue && value >= Intersection.MinValue)
                 {
                     Point3D pointToCheck = ray.PointAt(value);
                     pointToCheck[componentIndex] = component;
                     if (this.Contains(pointToCheck))
                     {
                         valueFound = true;
-                        closestValidValue = value;
+                        closestValue = value;
                         normalComponentIndex = componentIndex;
                     }
                 }
@@ -81,7 +81,7 @@ namespace Raytracer
                 normal[normalComponentIndex] = 1;
                 return new Intersection
                 {
-                    value = closestValidValue,
+                    value = closestValue,
                     normal = normal,
                     color = color
                 };

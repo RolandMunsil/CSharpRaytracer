@@ -1,4 +1,4 @@
-﻿using PixelWindowCSharp;
+﻿using PixelWindowSDL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +15,6 @@ namespace Raytracer
         public YPlane(double y)
         {
             this.Y = y;
-            this.reflectivity = 0;
-            this.refractivity = 0;
         }
 
         public override Intersection GetNearestIntersection(Ray ray)
@@ -73,10 +71,10 @@ namespace Raytracer
             return point.y == Y;
         }
 
-        private ARGBColor ColorAt(double x, double z)
+        private Color ColorAt(double x, double z)
         {
-            //return x.PMod(20) < 10 ^ z.PMod(20) < 10 ? (ARGBColor)0xFF4A7023 : (ARGBColor)0xFF78AB46;
-            return x.PMod(200) < 100 ^ z.PMod(200) < 100 ? (ARGBColor)0xFFFFFFFF : (ARGBColor)0xFF000000;
+            //return x.PMod(20) < 10 ^ z.PMod(20) < 10 ? (Color)0x4A7023 : (Color)0x78AB46;
+            return x.PMod(200) < 100 ^ z.PMod(200) < 100 ? Color.White : Color.Black;
         }
     }
 }
