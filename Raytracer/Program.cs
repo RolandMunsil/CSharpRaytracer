@@ -21,7 +21,7 @@ namespace Raytracer
         static CSGObject coolCubeThing = (new Cuboid(Point3D.Zero, 800, 800, 800, niceBlue)
                                   {
                                       refractivity = 0.9,
-                                      refractionIndex = 2
+                                      refractionIndex = 1.51
                                   } -
                                   (new Sphere(new Point3D(0, 0, 0), 500, niceBlue) |
                                     new Sphere(new Point3D(400, 400, -400), 192.820323027550917, niceBlue) |
@@ -35,10 +35,10 @@ namespace Raytracer
 
         static YPlane plane = new YPlane(-400.01f)
         {
-            reflectivity = .7f,
+            reflectivity = .75f,
         };
 
-        static Sphere regularSphere = new Sphere(Point3D.Zero, 400, goodGray) { refractivity = 1, refractionIndex = 1.6};
+        static Sphere regularSphere = new Sphere(Point3D.Zero, 400, (Color)0x545454) { refractivity = 0.9, refractionIndex = 1.51 };
         static Sphere slightlySmallerSphere = new Sphere(Point3D.Zero, 390, niceGreen) { refractivity = 0.99, refractionIndex = 1.5 };
 
         static Cuboid cube1 = new Cuboid(new Point3D(-900, -200, 0), 400, 400, 400, Color.Red);
@@ -52,20 +52,20 @@ namespace Raytracer
                 skyColor = new Color(154, 206, 235),
                 renderedObjects = new Renderable[]
                 {
-                    //coolCubeThing,
-                    regularSphere,
+                    coolCubeThing,
+                    //regularSphere,
                     cube1,
                     cube2,
                     sphere2,
                     shinySphere,
-                    plane
+                    plane,
                 },
                 lightSources = new LightSource[]
                 {
                     new LightSource
                     {
                         position = new Point3D(0, 1000, -1000),
-                        maxLitDistance = 3000
+                        maxLitDistance = 6000
                     }
                 },
                 camera = new Camera(new Point3D(500, 900, -1600), new Point3D(0, 0, 0))
@@ -78,15 +78,16 @@ namespace Raytracer
                     antialiasAmount = 1,
                     parallelRendering = false,
                     lightingEnabled = true,
-                    ambientLight = 0.7f,
+                    ambientLight = 0.0f,
                     maxReflections = 16,
                     maxRefractions = 16,
 
-                    imageWidth = 1600,
-                    imageHeight = 900,
+                    imageWidth = 1600 + 800,
+                    imageHeight = 900 + 450,
 
                     animationFunction = delegate(int frameCount)
                     {
+                        frameCount *= 75 / 2;
                         double angle = (Math.PI * 2) * (frameCount / (double)(10 * 30));
                         scene.camera.ChangePositionAndLookingAt(new Point3D(1700 * Math.Sin(angle), 900, 1700 * -Math.Cos(angle)), new Point3D(0, 0, 0));
 
@@ -128,17 +129,22 @@ namespace Raytracer
 
                             for (int y = 0; y < window.ClientHeight; y++)
                             {
-                                window[x, y] = CalculatePixelColor(x, y, window, cameraIsInsideObject);
+                                Color pixelColor = CalculatePixelColor(x, y, window, cameraIsInsideObject);
+                                //TODO: queue with separate thread?
+                                lock(window)
+                                {
+                                    window[x, y] = pixelColor;
+                                }
                             }
 
                             //I realize the increment isn't thread safe but I figure it's not that important that it is - these updates are purely to make the render less boring to watch
-                            //if (++verticalLinesRendered % 64 == 0)
-                            //{
-                            //    lock (window)
-                            //    {
-                            //        window.UpdateClient();
-                            //    }
-                            //}
+                            if (++verticalLinesRendered % 64 == 0)
+                            {
+                                lock (window)
+                                {
+                                    window.UpdateClient();
+                                }
+                            }
                         });
                     }
                     else
