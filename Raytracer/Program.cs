@@ -93,16 +93,15 @@ namespace Raytracer
                     imageWidth = 1600,
                     imageHeight = 900,
 
-                    animationFunction = delegate(int frameCount)
-                    {
-                        return;
-                        frameCount *= 75 / 2;
-                        double angle = (Math.PI * 2) * (frameCount / (double)(10 * 30));
-                        scene.camera.ChangePositionAndLookingAt(new Point3D(1700 * Math.Sin(angle), 900, 1700 * -Math.Cos(angle)), new Point3D(0, 0, 0));
+                    //animationFunction = delegate(int frameCount)
+                    //{
+                    //    frameCount *= 75 / 2;
+                    //    double angle = (Math.PI * 2) * (frameCount / (double)(10 * 30));
+                    //    scene.camera.ChangePositionAndLookingAt(new Point3D(1700 * Math.Sin(angle), 900, 1700 * -Math.Cos(angle)), new Point3D(0, 0, 0));
 
-                        //double angle = (Math.PI * 2) * (frameCount / 10.0);
-                        //scene.camera.ChangePositionAndLookingAt(new Point3D(0, Math.Sin(angle) * 1600, Math.Cos(angle) * 1600), new Point3D(0, 0, 0));
-                    }
+                    //    //double angle = (Math.PI * 2) * (frameCount / 10.0);
+                    //    //scene.camera.ChangePositionAndLookingAt(new Point3D(0, Math.Sin(angle) * 1600, Math.Cos(angle) * 1600), new Point3D(0, 0, 0));
+                    //}
                 }
             };
 

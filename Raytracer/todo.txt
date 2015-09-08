@@ -4,7 +4,6 @@
  * Better way of saving images/videos
  * Objects to make
    - Torus
-   - Cylinder
    - Hyperbola(s)?
    - Pyramid?
  * Lenslike camera
