@@ -52,8 +52,8 @@ namespace Raytracer
                 skyColor = new Color(154, 206, 235),
                 renderedObjects = new Renderable[]
                 {
-                    coolCubeThing,
-                    //regularSphere,
+                    //coolCubeThing,
+                    regularSphere,
                     cube1,
                     cube2,
                     sphere2,
@@ -65,6 +65,11 @@ namespace Raytracer
                     new LightSource
                     {
                         position = new Point3D(0, 1000, -1000),
+                        maxLitDistance = 6000
+                    },
+                    new LightSource
+                    {
+                        position = new Point3D(0, 1000, 1000),
                         maxLitDistance = 6000
                     }
                 },
@@ -293,13 +298,15 @@ namespace Raytracer
                         n = -n;
                     }
 
-                    lambertianShadingLight = (1 - scene.options.ambientLight) * Math.Max(0, Vector3D.DotProduct(n, l));
+                    double thisLambertianShadingLight = ((1 - scene.options.ambientLight) / scene.lightSources.Length) * Math.Max(0, Vector3D.DotProduct(n, l));
 
                     //Less light farther away
                     double distFrac = (vecToLight.Length / source.maxLitDistance);
                     double multiplier = Math.Min(1, 1f - (distFrac * distFrac));
-                    lambertianShadingLight *= multiplier;
-                    lambertianShadingLight *= lightLetThroughAmount;
+                    thisLambertianShadingLight *= multiplier;
+                    thisLambertianShadingLight *= lightLetThroughAmount;
+
+                    lambertianShadingLight += thisLambertianShadingLight;
                 }
                 totalLight = Math.Min(1, ambientLight + lambertianShadingLight);
             }
