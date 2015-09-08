@@ -2,3 +2,12 @@
  * 3D rendering (like side-by-side and stuff)
  * Colored light
  * Better way of saving images/videos
+ * Objects to make
+   - Torus
+   - Cylinder
+   - Hyperbola(s)?
+   - Pyramid?
+ * Lenslike camera
+ * Orthographic projection
+ * Bezier surfaces
+ * Calculate pixel with floating point color componets
