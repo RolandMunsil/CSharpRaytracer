@@ -48,10 +48,12 @@
     <Compile Include="Matrix3x3.cs" />
     <Compile Include="Renderables\CSGObject.cs" />
     <Compile Include="Renderables\Cuboid.cs" />
+    <Compile Include="Renderables\YCylinder.cs" />
     <Compile Include="Renderables\Renderable.cs" />
     <Compile Include="Point3D.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Ray.cs" />
+    <Compile Include="Renderables\Torus.cs" />
     <Compile Include="Scene.cs" />
     <Compile Include="Renderables\Sphere.cs" />
     <Compile Include="Vector3D.cs" />
@@ -63,6 +65,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="todo.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
