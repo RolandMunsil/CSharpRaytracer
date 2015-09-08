@@ -12,9 +12,20 @@ namespace Raytracer
         double Y;
         private static readonly Vector3D Normal = new Vector3D(0, 1, 0);
 
+        bool hasColor;
+        Color color;
+
         public YPlane(double y)
         {
             this.Y = y;
+            hasColor = false;
+        }
+
+        public YPlane(double y, Color color)
+        {
+            this.Y = y;
+            this.color = color;
+            hasColor = true;
         }
 
         public override Intersection GetNearestIntersection(Ray ray)
@@ -73,6 +84,10 @@ namespace Raytracer
 
         private Color ColorAt(double x, double z)
         {
+            if (hasColor)
+            {
+                return color;
+            }
             //return x.PMod(20) < 10 ^ z.PMod(20) < 10 ? (Color)0x4A7023 : (Color)0x78AB46;
             return x.PMod(200) < 100 ^ z.PMod(200) < 100 ? Color.White : Color.Black;
         }
