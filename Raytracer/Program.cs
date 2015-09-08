@@ -12,6 +12,13 @@ namespace Raytracer
 {
     static class Program
     {
+        static class RefractionIndexes
+        {
+            public const double Air = 1;
+            public const double Water = 1.333;
+            public const double Glass = 1.51;
+        }
+
         static Color niceBlue =   new Color(26, 128, 255);
         static Color niceYellow = new Color(255, 240, 26);
         static Color niceRed =    new Color(255, 76, 26);
@@ -53,7 +60,8 @@ namespace Raytracer
                 renderedObjects = new Renderable[]
                 {
                     //coolCubeThing,
-                    regularSphere,
+                    //regularSphere,
+                    new YCylinder(Point3D.Zero, 200, 800, (Color)0x545454) { refractivity = 0.8, refractionIndex = RefractionIndexes.Water },
                     cube1,
                     cube2,
                     sphere2,
@@ -66,14 +74,9 @@ namespace Raytracer
                     {
                         position = new Point3D(0, 1000, -1000),
                         maxLitDistance = 6000
-                    },
-                    new LightSource
-                    {
-                        position = new Point3D(0, 1000, 1000),
-                        maxLitDistance = 6000
                     }
                 },
-                camera = new Camera(new Point3D(500, 900, -1600), new Point3D(0, 0, 0))
+                camera = new Camera(new Point3D(500, 300, -1600), new Point3D(0, 0, 0))
                 {
                     //put them here instead of in the constructor for clarity
                     zoom = 1300
@@ -82,16 +85,17 @@ namespace Raytracer
                 {
                     antialiasAmount = 1,
                     parallelRendering = false,
-                    lightingEnabled = true,
+                    lightingEnabled = false,
                     ambientLight = 0.0f,
                     maxReflections = 16,
                     maxRefractions = 16,
 
-                    imageWidth = 1600 + 800,
-                    imageHeight = 900 + 450,
+                    imageWidth = 1600,
+                    imageHeight = 900,
 
                     animationFunction = delegate(int frameCount)
                     {
+                        return;
                         frameCount *= 75 / 2;
                         double angle = (Math.PI * 2) * (frameCount / (double)(10 * 30));
                         scene.camera.ChangePositionAndLookingAt(new Point3D(1700 * Math.Sin(angle), 900, 1700 * -Math.Cos(angle)), new Point3D(0, 0, 0));
@@ -102,7 +106,7 @@ namespace Raytracer
                 }
             };
 
-        public static double airRefractIndex = 1f;
+        public static double airRefractIndex = RefractionIndexes.Air;
 
         public static void Main(string[] args)
         {
