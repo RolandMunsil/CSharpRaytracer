@@ -12,6 +12,8 @@ namespace Raytracer
 {
     static class Program
     {
+
+
         static class RefractionIndexes
         {
             public const double Air = 1;
@@ -102,6 +104,22 @@ namespace Raytracer
                     //    //double angle = (Math.PI * 2) * (frameCount / 10.0);
                     //    //scene.camera.ChangePositionAndLookingAt(new Point3D(0, Math.Sin(angle) * 1600, Math.Cos(angle) * 1600), new Point3D(0, 0, 0));
                     //}
+                },
+                animationOptions = new Scene.AnimationOptions
+                {
+                    doAnimation = true,
+                    animationFunction = delegate(int frameCount)
+                    {
+                        //frameCount *= 75 / 2;
+                        double angle = (Math.PI * 2) * (frameCount / (double)(10 * 30));
+                        scene.camera.ChangePositionAndLookingAt(new Point3D(1700 * Math.Sin(angle), 300, 1700 * -Math.Cos(angle)), new Point3D(0, 0, 0));
+
+                        //double angle = (Math.PI * 2) * (frameCount / 10.0);
+                        //scene.camera.ChangePositionAndLookingAt(new Point3D(0, Math.Sin(angle) * 1600, Math.Cos(angle) * 1600), new Point3D(0, 0, 0));
+                    },
+                    saveAnimation = false,
+                    animationsBasePath = "../../../Renders/",
+                    animationFrameCount = 300
                 }
             };
 
@@ -116,11 +134,20 @@ namespace Raytracer
                 bool cameraIsInsideObject = scene.renderedObjects.Any(obj => obj.Contains(scene.camera.position));
                 int frameCount = 0;
 
+                String animationDirectory = "";
+                if (scene.animationOptions.doAnimation)
+                {
+                    int i = 0;
+                    while (Directory.Exists("Animation " + ++i)) ;
+                    animationDirectory = "Animation " + i;
+                    Directory.CreateDirectory(scene.animationOptions.animationsBasePath + animationDirectory);
+                }
+
                 do
                 {
-                    if (scene.options.animationFunction != null)
+                    if (scene.animationOptions.doAnimation && scene.animationOptions.animationFunction != null)
                     {
-                        scene.options.animationFunction(frameCount++);
+                        scene.animationOptions.animationFunction(frameCount++);
                     }
 
                     int verticalLinesRendered = 0;
@@ -175,15 +202,19 @@ namespace Raytracer
 
                     window.UpdateClient();
 
-                    //ffmpeg -f image2 -framerate 30 -loop 1 -t 00:00:20 -i images4/%03d.png -vcodec libx264 -crf 0 images4.avi
-                    //window.BackBuffer.Save("../../../Renders/images5/" + frameCount.ToString("000") + ".png");
+                    //ffmpeg -f image2 -framerate 30 -loop 1 -t 00:00:20 -i images4/%03d.png -vcodec libx265 -crf 0 images4.avi
 
-                    //if (frameCount == 300)
-                    //{
-                    //    return;
-                    //}
+                    if(scene.animationOptions.saveAnimation)
+                    {
+                        window.SaveClientToPNG(scene.animationOptions.animationsBasePath + animationDirectory + "/" + frameCount.ToString("000") + ".png");
 
-                } while (scene.options.animationFunction != null);
+                        if (frameCount == scene.animationOptions.animationFrameCount)
+                        {
+                            return;
+                        }
+                    }
+
+                } while (scene.animationOptions.doAnimation);
 
                 //while (!window.IsClosed);
             }

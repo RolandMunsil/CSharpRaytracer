@@ -28,12 +28,21 @@ namespace Raytracer
             public int maxRefractions;
             public int imageWidth;
             public int imageHeight;
-            public AnimationFunction animationFunction;
         }
+        public struct AnimationOptions
+        {
+            public bool doAnimation;
+            public AnimationFunction animationFunction;
+            public bool saveAnimation;
+            public int animationFrameCount;
+            public String animationsBasePath;
+        }
+
         public Color skyColor;
         public Renderable[] renderedObjects;
         public LightSource[] lightSources;
         public Camera camera;
         public RenderOptions options;
+        public AnimationOptions animationOptions;
     }
 }
