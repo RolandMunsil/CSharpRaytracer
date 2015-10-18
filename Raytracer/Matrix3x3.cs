@@ -77,6 +77,7 @@ namespace Raytracer
             return matrix;
         }
 
+        //TODO: figure out why it seems like rotations have to be done in reverse order
         public static Matrix3x3 operator *(Matrix3x3 m1, Matrix3x3 m2)
         {
             Matrix3x3 matrix = new Matrix3x3();
@@ -104,6 +105,15 @@ namespace Raytracer
                 z = (m1[2, 0] * v.x) + (m1[2, 1] * v.y) + (m1[2, 2] * v.z),
 
             };
+        }
+
+        public static implicit operator Matrix3x3(double[,] array2D)
+        {
+            if (array2D.GetLength(0) == 3 && array2D.GetLength(1) == 3)
+            {
+                return new Matrix3x3 { elements = array2D };
+            }
+            throw new InvalidCastException();
         }
     }
 }

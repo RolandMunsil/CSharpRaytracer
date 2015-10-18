@@ -64,9 +64,19 @@ namespace Raytracer
             return new Vector3D(left.x - right.x, left.y - right.y, left.z - right.z);
         }
 
+        public static Point3D operator -(Point3D left, Vector3D right)
+        {
+            return new Point3D(left.x - right.x, left.y - right.y, left.z - right.z);
+        }
+
         public static Point3D operator *(Point3D vector, double multiplier)
         {
             return new Point3D(vector.x * multiplier, vector.y * multiplier, vector.z * multiplier);
+        }
+
+        public static explicit operator Vector3D(Point3D point)
+        {
+            return new Vector3D(point.x, point.y, point.z);
         }
 
         public override string ToString()

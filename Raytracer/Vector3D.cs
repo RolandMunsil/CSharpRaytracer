@@ -29,6 +29,28 @@ namespace Raytracer
             }
         }
 
+        static Random rand = new Random();
+
+        /// <summary>
+        /// Returns a random unit vector.
+        /// </summary>
+        /// <returns></returns>
+        public static Vector3D RandomUnitVector(double maxAngleFromUnitZ = Math.PI)
+        {
+            double thing = (Math.Cos(Math.PI - maxAngleFromUnitZ) + 1) / 2;
+            double randOneNegativeOne = 2 * (rand.NextDouble() * thing) - 1;
+            double rotYZ = Math.Acos(randOneNegativeOne) - Math.PI / 2;
+            double rotXZ = rand.NextDouble() * (Math.PI * 2);
+
+            return Matrix3x3.RotationAboutXAxis(-Math.PI / 2) * ((Matrix3x3.RotationAboutYAxis(rotXZ) * Matrix3x3.RotationAboutXAxis(rotYZ)) * new Vector3D(0, 0, 1));
+        }
+
+        public static Vector3D RandomUnitVectorFrom(Vector3D vector, double maxAngleFromVector)
+        {
+            Vector3D randomVector = RandomUnitVector(maxAngleFromVector);
+            return Matrix3x3.RotationAboutYAxis(vector.AngleXZ) * Matrix3x3.RotationAboutXAxis(vector.AngleFromHorizontalPlane) * randomVector;
+        }
+
         //I feel like maybe this is a horrible hacky thing.
         public double this[int index]
         {
@@ -433,6 +455,11 @@ namespace Raytracer
         public static Vector3D operator -(Vector3D vector)
         {
             return new Vector3D(-vector.x, -vector.y, -vector.z);
+        }
+
+        public static explicit operator Point3D(Vector3D vector)
+        {
+            return new Point3D(vector.x, vector.y, vector.z);
         }
 
         public override string ToString()
