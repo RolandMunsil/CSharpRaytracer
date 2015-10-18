@@ -296,6 +296,7 @@ namespace Raytracer
                 red = (byte)(rSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
                 green = (byte)(gSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
                 blue = (byte)(bSum / (scene.options.antialiasAmount * scene.options.antialiasAmount)),
+                alpha = 255
             };
             //{
             //    red = (byte)avgTime,
