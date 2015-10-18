@@ -59,40 +59,45 @@ namespace Raytracer
         static Scene scene = new Scene
             {
                 skyColor = new Color(154, 206, 235),
-                renderedObjects = new Renderable[]
+                renderedObjects = new List<Renderable>
                 {
                     //coolCubeThing,
                     //regularSphere,
-                    new YCylinder(Point3D.Zero, 200, 800, (Color)0x545454) { refractivity = 0.8, refractionIndex = RefractionIndexes.Water },
-                    cube1,
-                    cube2,
-                    sphere2,
-                    shinySphere,
-                    plane,
+                    //new YCylinder(Point3D.Zero, 200, 800, (Color)0x545454),
+                    //cube1,
+                    //cube2,
+                    //sphere2,
+                    //shinySphere,
+                    //plane,
+                    new Cuboid(Point3D.Zero, 7000, 7000, 7000, Color.White) - new Cuboid(Point3D.Zero, 6000, 6000, 6000, Color.White),
                 },
                 lightSources = new LightSource[]
                 {
                     new LightSource
                     {
-                        position = new Point3D(0, 1000, -1000),
-                        maxLitDistance = 6000
+                        position = new Point3D(0, 2900, 0),
+                        maxLitDistance = 12000
+                    },
+                    new LightSource
+                    {
+                        position = new Point3D(2900, 0, 0),
+                        maxLitDistance = 12000
                     }
                 },
-                camera = new Camera(new Point3D(500, 300, -1600), new Point3D(0, 0, 0))
+                camera = new Camera(new Point3D(2900, 500, -2900), new Point3D(0, 0, 0))
                 {
-                    //put them here instead of in the constructor for clarity
-                    zoom = 1300
+                    zoom = 1000
                 },
                 options = new Scene.RenderOptions
                 {
                     antialiasAmount = 1,
-                    parallelRendering = false,
-                    lightingEnabled = false,
-                    ambientLight = 0.0f,
+                    parallelRendering = true,
+                    lightingEnabled = true,
+                    ambientLight = 0.5f,
                     maxReflections = 16,
                     maxRefractions = 16,
 
-                    imageWidth = 1600,
+                    imageWidth = 900,
                     imageHeight = 900,
 
                     //animationFunction = delegate(int frameCount)
@@ -108,18 +113,14 @@ namespace Raytracer
                 animationOptions = new Scene.AnimationOptions
                 {
                     doAnimation = true,
-                    animationFunction = delegate(int frameCount)
+                    animationFunction = delegate(int frameCount, double animationDoneAmount)
                     {
-                        //frameCount *= 75 / 2;
-                        double angle = (Math.PI * 2) * (frameCount / (double)(10 * 30));
-                        scene.camera.ChangePositionAndLookingAt(new Point3D(1700 * Math.Sin(angle), 300, 1700 * -Math.Cos(angle)), new Point3D(0, 0, 0));
-
-                        //double angle = (Math.PI * 2) * (frameCount / 10.0);
-                        //scene.camera.ChangePositionAndLookingAt(new Point3D(0, Math.Sin(angle) * 1600, Math.Cos(angle) * 1600), new Point3D(0, 0, 0));
+                        double angle = animationDoneAmount * Math.PI * 2;
+                        scene.camera.ChangePositionAndLookingAt(new Point3D(Math.Sin(angle) * 2900, 500, Math.Cos(angle) * 2900), Point3D.Zero);
                     },
                     saveAnimation = false,
                     animationsBasePath = "../../../Renders/",
-                    animationFrameCount = 300
+                    animationFrameCount = 120
                 }
             };
 
@@ -127,7 +128,43 @@ namespace Raytracer
 
         public static void Main(string[] args)
         {
-            //Directory.CreateDirectory("images5");
+            double sphereRadius = 100;
+            int numSpheres = 40;
+            Random rand = new Random();
+
+
+            Point3D artCenter = Point3D.Zero;
+
+            scene.renderedObjects.Add(new Sphere(Point3D.Zero, sphereRadius, Color.White));
+
+            Vector3D prevDiff = Vector3D.RandomUnitVector();
+            Point3D prevCenter = Point3D.Zero;
+
+            for (int i = 0; i < numSpheres; i++)
+            {
+                Vector3D newDiff = sphereRadius * 2 * Vector3D.RandomUnitVectorFrom(prevDiff, Math.PI / 2);
+                Point3D newCenter = prevCenter + newDiff;
+
+                Color c = Color.White;
+                if (rand.Next(10) == 0) c = new Color(255, 128, 128);
+                if (rand.Next(20) == 0) c = new Color(192, 192, 255);
+
+                scene.renderedObjects.Add(new Sphere(newCenter, sphereRadius, c));
+
+                artCenter += ((Vector3D)newCenter) / (double)numSpheres;
+
+                prevDiff = newDiff;
+                prevCenter = newCenter;
+            }
+
+            foreach(Renderable r in scene.renderedObjects)
+            {
+                if(r is Sphere)
+                {
+                    ((Sphere)r).center -= (Vector3D)artCenter;
+                }
+            }
+
 
             using (PixelWindow window = new PixelWindow(scene.options.imageWidth, scene.options.imageHeight, true))
             {
@@ -147,7 +184,8 @@ namespace Raytracer
                 {
                     if (scene.animationOptions.doAnimation && scene.animationOptions.animationFunction != null)
                     {
-                        scene.animationOptions.animationFunction(frameCount++);
+                        scene.animationOptions.animationFunction(frameCount, (frameCount / (double)scene.animationOptions.animationFrameCount));
+                        frameCount++;
                     }
 
                     int verticalLinesRendered = 0;
@@ -216,13 +254,13 @@ namespace Raytracer
 
                 } while (scene.animationOptions.doAnimation);
 
-                //while (!window.IsClosed);
+                while (window.IsOpen);
             }
         }
 
         private static Color CalculatePixelColor(int x, int y, PixelWindow window, bool cameraIsInsideObject)
         {
-            if (x == 800 && y == 456)
+            if (x == 1200 && y == 456)
             {
                 //return Color.Red;
                 //Debugger.Break();
