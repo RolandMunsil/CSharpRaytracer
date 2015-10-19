@@ -175,7 +175,7 @@ namespace Raytracer
                 if (scene.animationOptions.doAnimation)
                 {
                     int i = 0;
-                    while (Directory.Exists("Animation " + ++i)) ;
+                    while (Directory.Exists(scene.animationOptions.animationsBasePath + "Animation " + ++i)) ;
                     animationDirectory = "Animation " + i;
                     Directory.CreateDirectory(scene.animationOptions.animationsBasePath + animationDirectory);
                 }
