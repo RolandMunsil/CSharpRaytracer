@@ -154,148 +154,10 @@ namespace Raytracer
                 v1.x * v2.y - v2.x * v1.y
                 );
 
-            //if (v.Length > .000000001)
-            //{
-            //    if (Math.Abs(v.AngleTo(v1) - (Math.PI / 2)) > .0001)
-            //    {
-            //        Debugger.Break();
-            //    }
-            //    if (Math.Abs(v.AngleTo(v2) - (Math.PI / 2)) > .0001)
-            //    {
-            //        Debugger.Break();
-            //    }
-            //}
-
             return v;
         }
 
         public Vector3D Reflected(Vector3D surfaceNormal)
-        {
-            //Vector3D n = surfaceNormal.Normalized();
-            //Vector3D l = this.Normalized();
-
-            //double cosθ1 = DotProduct(-n, l);
-            //if (cosθ1 <= 0)
-            //{
-            //    n = -n;
-            //    cosθ1 = DotProduct(-n, l);
-            //}
-            //else
-            //{
-            //    if (DotProduct(n, l) > 0)
-            //    {
-            //        Debugger.Break();
-            //    }
-            //}
-
-            //return l + 2 * cosθ1 * n;
-
-            Vector3D normalizedNormal = surfaceNormal.Normalized();
-            double dotProduct = DotProduct(this, normalizedNormal);
-            Vector3D dunno = (normalizedNormal * 2) * dotProduct;
-
-            Vector3D answer = this - dunno;
-
-            //if (Math.Abs(answer.AngleTo(normalizedNormal) - ((-this).AngleTo(normalizedNormal))) > .0001)
-            //{
-            //    var a = answer.AngleTo(normalizedNormal);
-            //    var b = (-this).AngleTo(normalizedNormal);
-            //    Debugger.Break();
-            //}
-
-            //if ((CrossProduct(-this, normalizedNormal).Normalized() - CrossProduct(normalizedNormal, answer).Normalized()).Length > .0001)
-            //{
-            //    var a = CrossProduct(-this, normalizedNormal).Normalized();
-            //    var b = CrossProduct(normalizedNormal, answer).Normalized();
-            //    Debugger.Break();
-            //}
-
-            return answer;
-        }
-
-        //Alright so clearly something else is causing the problem. The refraction equation is correct but something else is screwing it up.
-        //Idea: compare Java calculations to this calculations on the same scene.
-
-        //http://en.wikipedia.org/wiki/Snell's_law#Vector_form
-        public Vector3D Refracted(Vector3D surfaceNormal, double refractIndexFrom, double refractIndexTo, out bool totalInternalReflection)
-        {
-            //totalInternalReflection = false;
-            //return RefractSlow(surfaceNormal, this, refractIndexFrom, refractIndexTo);
-
-            return RefractedV2(surfaceNormal, refractIndexFrom, refractIndexTo, out totalInternalReflection);
-
-            //Vector3D normal = (surfaceNormal).Normalized();
-            //Vector3D thisNormalized = this.Normalized();
-
-            //double cos1 = DotProduct(thisNormalized, -normal);
-            //if (cos1 < 0)
-            //{
-            //    normal = -normal;
-            //    cos1 = DotProduct(thisNormalized, normal);
-            //}
-
-            //double refractRatio = refractIndexFrom / refractIndexTo;
-
-            //double otherSine = refractRatio * Math.Sqrt(1 - (cos1 * cos1));
-
-            //if (otherSine > 1) //Total internal reflection
-            //{
-            //    totalInternalReflection = true;
-            //    Vector3D ret = this.Reflected(normal);
-            //    return ret;
-            //}
-            //else
-            //{
-            //    double cos2 = Math.Sqrt(1 - (otherSine * otherSine));
-            //    double nMult = (refractRatio * cos1) - cos2;
-
-            //    totalInternalReflection = false;
-            //    Vector3D ret = (thisNormalized * refractRatio) + (normal * nMult);
-            //    return ret;
-            //}
-        }
-
-        public Vector3D RefractedJava(Vector3D surfaceNormal, double refractIndexFrom, double refractIndexTo, out bool totalInternalReflection)
-        {
-            Vector3D negNormal = new Vector3D(-surfaceNormal.x, -surfaceNormal.y, -surfaceNormal.z);
-            negNormal.Normalize();
-            this.Normalize();
-
-            double cos1 = Vector3D.DotProduct(this, negNormal);
-            if (cos1 < 0)
-            {
-                cos1 = Vector3D.DotProduct(this, surfaceNormal.Normalized());
-
-                //int k = 1 / 0;
-            }
-
-            double refractRatio = refractIndexFrom / refractIndexTo;
-            double otherSine = refractRatio * Math.Sqrt(1 - (cos1 * cos1));
-
-            if (otherSine > 1)
-            {
-                //Total internal reflection
-                totalInternalReflection = true;
-                return ReflectedJava(surfaceNormal);
-            }
-            else
-            {
-                double cos2 = Math.Sqrt(1 - (otherSine * otherSine));
-                double nMult = (refractRatio * cos1) - cos2;
-
-                totalInternalReflection = false;
-                return (this * refractRatio) + (surfaceNormal * nMult);
-
-                //return new RefractionInfo(false,
-                //        Vector3D.Add(
-                //                Vector3D.Multiply(this, refractRatio),
-                //                Vector3D.Multiply(surfaceNormal, nMult)
-                //                )
-                //            );
-            }
-        }
-
-        public Vector3D ReflectedJava(Vector3D surfaceNormal)
         {
             Vector3D normalizedNormal = surfaceNormal.Normalized();
             double dotProduct = DotProduct(this, normalizedNormal);
@@ -303,8 +165,8 @@ namespace Raytracer
 
             return this - dunno;
         }
-
-        public Vector3D RefractedV2(Vector3D surfaceNormal, double refractIndexFrom, double refractIndexTo, out bool totalInternalReflection)
+        //http://en.wikipedia.org/wiki/Snell's_law#Vector_form
+        public Vector3D Refracted(Vector3D surfaceNormal, double refractIndexFrom, double refractIndexTo, out bool totalInternalReflection)
         {
             double n1 = refractIndexFrom;
             double n2 = refractIndexTo;
@@ -318,81 +180,20 @@ namespace Raytracer
                 n = -n;
                 cosθ1 = DotProduct(-n, l);
             }
-            //else
-            //{
-            //    if (DotProduct(n, l) > 0)
-            //    {
-            //        Debugger.Break();
-            //    }
-            //}
 
             double sinθ2 = (n1 / n2) * Math.Sqrt(1 - (cosθ1 * cosθ1));
 
-            if (1 - (sinθ2 * sinθ2) < 0) 
-            { 
-                totalInternalReflection = true; 
-                return this.Reflected(surfaceNormal); 
+            if (1 - (sinθ2 * sinθ2) < 0)
+            {
+                totalInternalReflection = true;
+                return this.Reflected(surfaceNormal);
             }
 
             double cosθ2 = Math.Sqrt(1 - (sinθ2 * sinθ2));
             Vector3D vrefract = l * (n1 / n2) + n * ((n1 / n2) * cosθ1 - cosθ2);
             totalInternalReflection = false;
 
-
-            //double inSnell = n1 * Math.Sin(AngleBetween(n, -l));
-            //double outSnell = n2 * Math.Sin(AngleBetween(n, -vrefract));
-            //if (Math.Abs(inSnell - outSnell) > 0.01)
-            //{
-            //    Debugger.Break();
-            //}
-
-            //if ((CrossProduct(-l, n).Normalized() - CrossProduct(n, vrefract).Normalized()).Length > .0001)
-            //{
-            //    var a = CrossProduct(-l, n);
-            //    var b = CrossProduct(n, vrefract);
-
-            //    if (a.Length > .00001 || b.Length > .00001)
-            //    {
-            //        Debugger.Break();
-            //    }
-            //}
-
-
             return vrefract;
-        }
-
-        Vector3D RefractSlow(Vector3D N, Vector3D I, double ki, double kr)
-        {
-            double r = ki / kr, r2 = r * r;
-            double invr = kr / ki, invr2 = invr * invr;
-
-            double ndoti, two_ndoti, ndoti2, a, b, b2, D2;
-            Vector3D T = new Vector3D();
-            ndoti = N.x * I.x + N.y * I.y + N.z * I.z;     // 3 mul, 2 add
-            ndoti2 = ndoti * ndoti;                    // 1 mul
-            if (ndoti >= 0.0) { b = r; b2 = r2; } else { b = invr; b2 = invr2; }
-            D2 = 1.0f - b2 * (1.0f - ndoti2);
-
-            if (D2 >= 0.0f)
-            {
-                if (ndoti >= 0.0f)
-                    a = b * ndoti - Math.Sqrt(D2); // 2 mul, 3 add, 1 sqrt
-                else
-                    a = b * ndoti + Math.Sqrt(D2);
-                T.x = a * N.x - b * I.x;     // 6 mul, 3 add
-                T.y = a * N.y - b * I.y;     // ----totals---------
-                T.z = a * N.z - b * I.z;     // 12 mul, 8 add, 1 sqrt!
-            }
-            else
-            {
-                // total internal reflection
-                // this usually doesn't happen, so I don't count it.
-                two_ndoti = ndoti + ndoti;         // +1 add
-                T.x = two_ndoti * N.x - I.x;      // +3 adds, +3 muls
-                T.y = two_ndoti * N.y - I.y;
-                T.z = two_ndoti * N.z - I.z;
-            }
-            return T;
         }
 
         public static double AngleBetween(Vector3D vec1, Vector3D vec2)
