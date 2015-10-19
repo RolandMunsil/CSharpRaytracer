@@ -120,7 +120,7 @@ namespace Raytracer
                     },
                     saveAnimation = false,
                     animationsBasePath = "../../../Renders/",
-                    animationFrameCount = 120
+                    animationFrameCount = 90
                 }
             };
 
@@ -132,10 +132,7 @@ namespace Raytracer
             int numSpheres = 40;
             Random rand = new Random();
 
-
             Point3D artCenter = Point3D.Zero;
-
-            scene.renderedObjects.Add(new Sphere(Point3D.Zero, sphereRadius, Color.White));
 
             Vector3D prevDiff = Vector3D.RandomUnitVector();
             Point3D prevCenter = Point3D.Zero;
@@ -147,7 +144,7 @@ namespace Raytracer
 
                 Color c = Color.White;
                 if (rand.Next(10) == 0) c = new Color(255, 128, 128);
-                if (rand.Next(20) == 0) c = new Color(192, 192, 255);
+                //if (rand.Next(20) == 0) c = new Color(192, 192, 255);
 
                 scene.renderedObjects.Add(new Sphere(newCenter, sphereRadius, c));
 
