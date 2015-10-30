@@ -51,6 +51,11 @@ namespace Raytracer
             return Matrix3x3.RotationAboutYAxis(vector.AngleXZ) * Matrix3x3.RotationAboutXAxis(vector.AngleFromHorizontalPlane) * randomVector;
         }
 
+        public static Vector3D RandomVectorInUnitSphere()
+        {
+            return RandomUnitVector() * (Math.Pow(rand.NextDouble(), 1.0 / 3.0));
+        }
+
         //I feel like maybe this is a horrible hacky thing.
         public double this[int index]
         {

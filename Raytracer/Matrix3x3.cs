@@ -77,7 +77,6 @@ namespace Raytracer
             return matrix;
         }
 
-        //TODO: figure out why it seems like rotations have to be done in reverse order
         public static Matrix3x3 operator *(Matrix3x3 m1, Matrix3x3 m2)
         {
             Matrix3x3 matrix = new Matrix3x3();
