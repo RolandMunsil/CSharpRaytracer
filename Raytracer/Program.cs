@@ -42,19 +42,21 @@ namespace Raytracer
                                     new Sphere(new Point3D(400, -400, 400), 192.820323027550917, niceBlue)
                                   ));
 
-        static YPlane plane = new YPlane(-400.01f)
+        static YPlane plane = new YPlane(-700.01f)
         {
             reflectivity = .75f,
         };
 
-        static Sphere regularSphere = new Sphere(Point3D.Zero, 400, (Color)0x545454) { refractivity = 0.9, refractionIndex = 1.51 };
+        static Sphere regularSphere = new Sphere(Point3D.Zero, 400, (Color)0xFF8300) { reflectivity = .4 };
         static Sphere slightlySmallerSphere = new Sphere(Point3D.Zero, 390, niceGreen) { refractivity = 0.99, refractionIndex = 1.5 };
 
         static Cuboid cube1 = new Cuboid(new Point3D(-900, -200, 0), 400, 400, 400, Color.Red);
         static Cuboid cube2 = new Cuboid(new Point3D(100, 100, -350), 200, 200, 200, Color.Blue);
 
-        static Sphere sphere2 = new Sphere(new Point3D(800, -100, 600), 300, new Color(255, 255, 0));
+        static Sphere sphere2 = new Sphere(new Point3D(-100, -100, 500), 300, new Color(255, 255, 0));
         static Sphere shinySphere = new Sphere(new Point3D(600, -300, -600), 100, (Color)0x545454) { reflectivity = 0.7 };
+
+        static Cuboid refractiveCuboid = new Cuboid(new Point3D(0, 0, 0), 1000, 1000, 1000, Color.White) { refractivity = 0.9, refractionIndex = RefractionIndexes.Glass };
 
         static Scene scene = new Scene
             {
@@ -66,32 +68,50 @@ namespace Raytracer
                     //new YCylinder(Point3D.Zero, 200, 800, (Color)0x545454),
                     //cube1,
                     //cube2,
-                    //sphere2,
+                    sphere2,
                     //shinySphere,
-                    //plane,
-                    new Cuboid(Point3D.Zero, 7000, 7000, 7000, Color.White) - new Cuboid(Point3D.Zero, 6000, 6000, 6000, Color.White),
+                    plane,
+                    new RotatedObject(refractiveCuboid, Point3D.Zero, 0, -.4)
+                    //new Sphere(Point3D.Zero, 1000, Color.Blue) { refractivity = 0.9, refractionIndex = 1},
+                    //new Cuboid(Point3D.Zero, 7000, 7000, 7000, Color.White) - new Cuboid(Point3D.Zero, 6000, 6000, 6000, Color.White),
                 },
                 lightSources = new LightSource[]
                 {
+                    //new LightSource
+                    //{
+                    //    position = new Point3D(0, 2900, 0),
+                    //    maxLitDistance = 12000
+                    //},
                     new LightSource
                     {
-                        position = new Point3D(0, 2900, 0),
-                        maxLitDistance = 12000
+                        position = new Point3D(1000, 3000, 1000),
+                        maxLitDistance = 10000
                     },
                     new LightSource
                     {
-                        position = new Point3D(2900, 0, 0),
-                        maxLitDistance = 12000
+                        position = new Point3D(-1000, 3000, 1000),
+                        maxLitDistance = 10000
+                    },
+                    new LightSource
+                    {
+                        position = new Point3D(1000, 3000, -1000),
+                        maxLitDistance = 10000
+                    },
+                    new LightSource
+                    {
+                        position = new Point3D(-1000, 3000, -1000),
+                        maxLitDistance = 10000
                     }
                 },
-                camera = new Camera(new Point3D(2900, 500, -2900), new Point3D(0, 0, 0))
+                camera = new Camera(new Point3D(1800 / 1.3, 1600 / 1.3, -3200 / 1.3), new Point3D(0, 0, 0))
+                //camera = new Camera(new Point3D(0, 0, -3000), new Point3D(0, 0, 0))
                 {
                     zoom = 1000
                 },
                 options = new Scene.RenderOptions
                 {
                     antialiasAmount = 1,
-                    parallelRendering = true,
+                    parallelRendering = false,
                     lightingEnabled = true,
                     ambientLight = 0.5f,
                     maxReflections = 16,
@@ -112,12 +132,8 @@ namespace Raytracer
                 },
                 animationOptions = new Scene.AnimationOptions
                 {
-                    doAnimation = true,
-                    animationFunction = delegate(int frameCount, double animationDoneAmount)
-                    {
-                        double angle = animationDoneAmount * Math.PI * 2;
-                        scene.camera.ChangePositionAndLookingAt(new Point3D(Math.Sin(angle) * 2900, 500, Math.Cos(angle) * 2900), Point3D.Zero);
-                    },
+                    doAnimation = false,
+                    animationFunction = null, //Defaults to RotateAround (TODO: figure out less hacky way to do this)
                     saveAnimation = false,
                     animationsBasePath = "../../../Renders/",
                     animationFrameCount = 90
@@ -128,39 +144,46 @@ namespace Raytracer
 
         public static void Main(string[] args)
         {
-            double sphereRadius = 100;
-            int numSpheres = 40;
-            Random rand = new Random();
+            //for(int i =0; i < 60; i++)
+            //{
+            //    scene.renderedObjects.Add(new Sphere((Point3D)(Vector3D.RandomUnitVector() * 1000), 20, Color.Red));
+            //}
 
-            Point3D artCenter = Point3D.Zero;
+            //double sphereRadius = 100;
+            //int numSpheres = 40;
+            //Random rand = new Random();
 
-            Vector3D prevDiff = Vector3D.RandomUnitVector();
-            Point3D prevCenter = Point3D.Zero;
+            //Point3D artCenter = Point3D.Zero;
 
-            for (int i = 0; i < numSpheres; i++)
-            {
-                Vector3D newDiff = sphereRadius * 2 * Vector3D.RandomUnitVectorFrom(prevDiff, Math.PI / 2);
-                Point3D newCenter = prevCenter + newDiff;
+            //Vector3D prevDiff = Vector3D.RandomUnitVector();
+            //Point3D prevCenter = Point3D.Zero;
 
-                Color c = Color.White;
-                if (rand.Next(10) == 0) c = new Color(255, 128, 128);
-                //if (rand.Next(20) == 0) c = new Color(192, 192, 255);
+            //for (int i = 0; i < numSpheres; i++)
+            //{
+            //    Vector3D newDiff = sphereRadius * 2 * Vector3D.RandomUnitVectorFrom(prevDiff, Math.PI / 2);
+            //    Point3D newCenter = prevCenter + newDiff;
 
-                scene.renderedObjects.Add(new Sphere(newCenter, sphereRadius, c));
+            //    Color c = Color.White;
+            //    if (rand.Next(10) == 0) c = new Color(255, 128, 128);
+            //    //if (rand.Next(20) == 0) c = new Color(192, 192, 255);
 
-                artCenter += ((Vector3D)newCenter) / (double)numSpheres;
+            //    scene.renderedObjects.Add(new Sphere(newCenter, sphereRadius, c));
 
-                prevDiff = newDiff;
-                prevCenter = newCenter;
-            }
+            //    artCenter += ((Vector3D)newCenter) / (double)numSpheres;
 
-            foreach(Renderable r in scene.renderedObjects)
-            {
-                if(r is Sphere)
-                {
-                    ((Sphere)r).center -= (Vector3D)artCenter;
-                }
-            }
+            //    prevDiff = newDiff;
+            //    prevCenter = newCenter;
+            //}
+
+            //foreach(Renderable r in scene.renderedObjects)
+            //{
+            //    if(r is Sphere)
+            //    {
+            //        ((Sphere)r).center -= (Vector3D)artCenter;
+            //    }
+            //}
+
+
 
 
             using (PixelWindow window = new PixelWindow(scene.options.imageWidth, scene.options.imageHeight, true))
@@ -169,12 +192,17 @@ namespace Raytracer
                 int frameCount = 0;
 
                 String animationDirectory = "";
-                if (scene.animationOptions.doAnimation)
+                if (scene.animationOptions.saveAnimation)
                 {
                     int i = 0;
                     while (Directory.Exists(scene.animationOptions.animationsBasePath + "Animation " + ++i)) ;
                     animationDirectory = "Animation " + i;
                     Directory.CreateDirectory(scene.animationOptions.animationsBasePath + animationDirectory);
+                }
+
+                if (scene.animationOptions.doAnimation && scene.animationOptions.animationFunction == null)
+                {
+                    scene.animationOptions.animationFunction = RotateAround();
                 }
 
                 do
@@ -410,6 +438,7 @@ namespace Raytracer
 
                 bool totalInternalReflection;
                 Vector3D refractedVector = ray.Direction.Refracted(closestIntersection.normal, refractIndexFrom, refractIndexTo, out totalInternalReflection);
+                //Ray refractedRay = new Ray(hitPoint, Vector3D.RandomUnitVectorFrom(refractedVector, Math.PI / 40));
                 Ray refractedRay = new Ray(hitPoint, refractedVector);
                 refractedColor = ColorOf(refractedRay, reflectionsLeft, --refractionsLeft, (!rayIsInObject) ^ totalInternalReflection);
             }
@@ -462,6 +491,18 @@ namespace Raytracer
         public static double PMod(this double dividend, double divisor)
         {
             return ((dividend % divisor) + divisor) % divisor;
+        }
+
+        public static Scene.AnimationFunction RotateAround()
+        {
+            Point3D initialCameraPos = scene.camera.position;
+            double y = initialCameraPos.y;
+            double radius = Math.Sqrt(initialCameraPos.x * initialCameraPos.x + initialCameraPos.z * initialCameraPos.z);
+            return delegate(int frameCount, double animationDoneAmount)
+            {
+                double angle = animationDoneAmount * Math.PI * 2;
+                scene.camera.ChangePositionAndLookingAt(new Point3D(Math.Sin(angle) * radius, y, Math.Cos(angle) * radius), Point3D.Zero);
+            };
         }
     }
 }
