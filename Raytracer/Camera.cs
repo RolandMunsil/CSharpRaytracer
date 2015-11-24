@@ -8,25 +8,20 @@ using System.Threading.Tasks;
 
 namespace Raytracer
 {
+    //TODO: should camera rays all originate from a single point? Should they originate from a plane?
+    //TODO: Orthographic camera
     class Camera
     {
         public Point3D position;
-        //public double facingAngleHoriz;
-        //public double facingAngleVert;
-
         Matrix3x3 rotationMatrix;
-
-        //todo: figure out more about this. size, camera as plane, camera as point, etc.
         public double zoom;
 
         public Camera(Point3D position, Point3D lookingAt)
         {
             this.position = position;
             Vector3D direction = lookingAt - position;
-            //facingAngleHoriz = direction.AngleXZ;
-            //facingAngleVert = direction.AngleFromHorizontalPlane;
 
-            rotationMatrix = Matrix3x3.RotationAboutYAxis(direction.AngleXZ) * Matrix3x3.RotationAboutXAxis(direction.AngleFromHorizontalPlane);
+            rotationMatrix = Matrix3x3.RotationAboutYAxis(direction.AngleAboutYAxis) * Matrix3x3.RotationAboutXAxis(direction.AngleFromHorizontalPlane);
         }
 
         public Ray RayAtPixel(double x, double y, PixelWindow window)
@@ -36,17 +31,8 @@ namespace Raytracer
 
             adjX /= zoom;
             adjY /= zoom;
-            Vector3D direction = new Vector3D(adjX, adjY, 1);
 
-            //Vector3D direction = new Vector3D(0, 0, 1);
-
-            //double angleX = (adjY / (window.ClientHeight / 2.0)) * (Math.PI / 4) * (900.0/1600.0);
-            //double angleY = (adjX / (window.ClientWidth / 2.0)) * (Math.PI / 4);
-
-            //direction = (Matrix3x3.RotationAboutYAxis(angleY) * Matrix3x3.RotationAboutXAxis(angleX)) * direction;
-
-            //direction.Rotate(facingAngleHoriz, facingAngleVert);
-            return new Ray(position, rotationMatrix * direction);
+            return new Ray(position, rotationMatrix * new Vector3D(adjX, adjY, 1));
         }
 
         //TODO: better name
@@ -54,7 +40,7 @@ namespace Raytracer
         {
             this.position = newPosition;
             Vector3D direction = newLookingAt - newPosition;
-            double facingAngleHoriz = direction.AngleXZ;
+            double facingAngleHoriz = direction.AngleAboutYAxis;
             double facingAngleVert = direction.AngleFromHorizontalPlane;
 
             rotationMatrix = Matrix3x3.RotationAboutYAxis(facingAngleHoriz) * Matrix3x3.RotationAboutXAxis(facingAngleVert);

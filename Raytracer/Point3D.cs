@@ -81,7 +81,7 @@ namespace Raytracer
 
         public override string ToString()
         {
-            return "X=" + x + " Y=" + y + " Z=" + z;
+            return "(" + x + ", " + y + ", " + z + ")";
         }
     }
 }

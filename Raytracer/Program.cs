@@ -82,24 +82,20 @@ namespace Raytracer
                     //    position = new Point3D(0, 2900, 0),
                     //    maxLitDistance = 12000
                     //},
-                    new LightSource
+                    new LightSource(1000, 3000, 1000)
                     {
-                        position = new Point3D(1000, 3000, 1000),
                         maxLitDistance = 10000
                     },
-                    new LightSource
+                    new LightSource(-1000, 3000, 1000)
                     {
-                        position = new Point3D(-1000, 3000, 1000),
                         maxLitDistance = 10000
                     },
-                    new LightSource
+                    new LightSource(1000, 3000, -1000)
                     {
-                        position = new Point3D(1000, 3000, -1000),
                         maxLitDistance = 10000
                     },
-                    new LightSource
+                    new LightSource(-1000, 3000, -1000)
                     {
-                        position = new Point3D(-1000, 3000, -1000),
                         maxLitDistance = 10000
                     }
                 },

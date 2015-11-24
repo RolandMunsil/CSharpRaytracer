@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Raytracer
 {
-    [DebuggerDisplay("({x}, {y}, {z})")]
     struct Vector3D
     {
         public double x;
@@ -48,7 +47,7 @@ namespace Raytracer
         public static Vector3D RandomUnitVectorFrom(Vector3D vector, double maxAngleFromVector)
         {
             Vector3D randomVector = RandomUnitVector(maxAngleFromVector);
-            return Matrix3x3.RotationAboutYAxis(vector.AngleXZ) * Matrix3x3.RotationAboutXAxis(vector.AngleFromHorizontalPlane) * randomVector;
+            return Matrix3x3.RotationAboutYAxis(vector.AngleAboutYAxis) * Matrix3x3.RotationAboutXAxis(vector.AngleFromHorizontalPlane) * randomVector;
         }
 
         public static Vector3D RandomVectorInUnitSphere()
@@ -88,28 +87,13 @@ namespace Raytracer
         /// if the vector points directly -x, this will return -π/2,
         /// etc.
         /// </summary>
-        public double AngleXZ
+        public double AngleAboutYAxis
         {
             get
             {
                 return Math.Atan2(x, z);
             }
         }
-
-        ///// <summary>
-        ///// Some example values:
-        ///// if the vector points directly +y, this will return π/2
-        ///// if the vector points directly +z, this will return 0
-        ///// if the vector points directly -y, this will return -π/2,
-        ///// etc.
-        ///// </summary>
-        //public double AngleYZ
-        //{
-        //    get
-        //    {
-        //        return Math.Atan2(Y, Z);
-        //    }
-        //}
 
         public double AngleFromHorizontalPlane
         {
@@ -132,7 +116,7 @@ namespace Raytracer
         {
             get
             {
-                return Math.Sqrt(x * x + y * y + z * z);
+                return Math.Sqrt(LengthSquared);
             }
         }
 
@@ -270,7 +254,7 @@ namespace Raytracer
 
         public override string ToString()
         {
-            return "X=" + x + " Y=" + y + " Z=" + z;
+            return "(" + x + ", " + y + ", " + z + ")";
         }
     }
 }
