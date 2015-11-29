@@ -12,7 +12,7 @@ namespace Raytracer
         public double maxLitDistance;
         //Color lightColor;
 
-        public LightSource();
+        public LightSource() { position = new Point3D(); maxLitDistance = 0; }
         public LightSource(double x, double y, double z)
             : this(new Point3D(x, y, z)) { }
 

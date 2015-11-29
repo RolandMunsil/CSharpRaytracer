@@ -1,7 +1,5 @@
-﻿ * Rotation of objects
- * 3D rendering (like side-by-side and stuff)
+﻿ * 3D rendering (like side-by-side and stuff)
  * Colored light
- * Better way of saving images/videos
  * Objects to make
    - Torus
    - Hyperbola(s)?
