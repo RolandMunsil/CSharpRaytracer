@@ -77,39 +77,38 @@ namespace Raytracer
 
         static Sphere shinySphere = new Sphere(new Point3D(600, -300, -600), 100, (Color)0x545454) { reflectivity = 0.7 };
 
+        static List<Renderable> wineGlassObjects = new List<Renderable>
+        {
+            //Table
+            new YPlane(-500.01),
+            //Wine glass
+            new Sphere(Point3D.Zero, 500, Color.Black) { reflectivity = 0.0, refractivity = 0.9, refractionIndex = RefractionIndexes.Glass }
+                - new Sphere(Point3D.Zero, 490, Color.White)
+                - new Cuboid(new Point3D(0, 500, 0), 1500, 400, 1500, Color.White),
+            //Wine
+            new Sphere(Point3D.Zero, 489, new Color(0x660000)) {refractivity = 0.7, refractionIndex = RefractionIndexes.Water}
+                - new Cuboid(new Point3D(0, 500, 0), 1500, 1200, 1500, new Color(0x660000)),
+        };
 
         static Scene scene = new Scene
         {
             skyColor = new Color(154, 206, 235),
-            renderedObjects = new List<Renderable>
-                {
-                    //coolCubeThing,
-                    //regularSphere,
-                    //new YCylinder(Point3D.Zero, 200, 800, (Color)0x545454),
-                    //cube1,
-                    //cube2,
-                    sphere2,
-                    //shinySphere,
-                    plane,
-                    new RotatedObject(refractiveCuboid, Point3D.Zero, 0, -.4)
-                    //new Sphere(Point3D.Zero, 1000, Color.Blue) { refractivity = 0.9, refractionIndex = 1},
-                    //new Cuboid(Point3D.Zero, 7000, 7000, 7000, Color.White) - new Cuboid(Point3D.Zero, 6000, 6000, 6000, Color.White),
-                },
+            renderedObjects = wineGlassObjects,
             lightSources = new LightSource[]
             {
-                new LightSource(new Point3D( 1000, 3000,  1000), 10000),
-                new LightSource(new Point3D(-1000, 3000,  1000), 10000),
-                new LightSource(new Point3D( 1000, 3000, -1000), 10000),
+                //new LightSource(new Point3D( 1000, 3000,  1000), 10000),
+                //new LightSource(new Point3D(-1000, 3000,  1000), 10000),
+                //new LightSource(new Point3D( 1000, 3000, -1000), 10000),
                 new LightSource(new Point3D(-1000, 3000, -1000), 10000)
             },
-            camera = new Camera(new Point3D(1800 / 1.3, 1600 / 1.3, -3200 / 1.3), new Point3D(0, 0, 0))
+            camera = new Camera(new Point3D(1400, 1000, -2500), new Point3D(0, 0, 0))
             {
-                zoom = 1000
+                zoom = 1700
             },
             options = new Scene.RenderOptions
             {
                 antialiasAmount = 1,
-                parallelRendering = false,
+                parallelRendering = true,
                 lightingEnabled = true,
                 ambientLight = 0.5f,
                 maxReflections = 16,
