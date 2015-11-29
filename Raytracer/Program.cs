@@ -218,7 +218,20 @@ namespace Raytracer
             if(hitObj == null)
             {
                 //No hit
-                return scene.options.lightingEnabled ? Color.Black : scene.skyColor;
+                if(scene.options.lightingEnabled)
+                {
+                    double brightness = scene.options.ambientLight;
+                    return new Color()
+                    {
+                        red = (byte)(scene.skyColor.red * brightness),
+                        green = (byte)(scene.skyColor.green * brightness),
+                        blue = (byte)(scene.skyColor.blue * brightness)
+                    };
+                }
+                else
+                {
+                    return scene.skyColor;
+                }
             }
 
             Point3D hitPoint = ray.PointAt(closestIntersection.value);
@@ -324,7 +337,7 @@ namespace Raytracer
         static byte CombineChannels(byte diffuse, byte reflected, byte refracted, Renderable obj, double litAmount)
         {
             //TODO: do some sort of L*a*b* transormation instead of just multiplying it?
-            return Math.Min((byte)0xFF, (byte)((diffuse * obj.DiffuseAmount * litAmount) + (reflected * obj.reflectivity * litAmount) + (refracted * obj.refractivity * litAmount)));
+            return Math.Min((byte)0xFF, (byte)((diffuse * obj.DiffuseAmount * litAmount) + (reflected * obj.reflectivity * litAmount) + (refracted * obj.refractivity)));
         }
 
         public static Renderable.Intersection Nearest(this IList<Renderable.Intersection> intersections)
