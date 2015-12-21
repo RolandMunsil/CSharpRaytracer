@@ -74,8 +74,9 @@ namespace Raytracer
                                     new Sphere(new Point3D(-400, 400, 400), 192.820323027550917, niceBlue) |
                                     new Sphere(new Point3D(400, -400, 400), 192.820323027550917, niceBlue)
                                   ));
-
         static Sphere shinySphere = new Sphere(new Point3D(600, -300, -600), 100, (Color)0x545454) { reflectivity = 0.7 };
+
+
 
         static List<Renderable> wineGlassObjects = new List<Renderable>
         {
@@ -90,10 +91,31 @@ namespace Raytracer
                 - new Cuboid(new Point3D(0, 500, 0), 1500, 1200, 1500, new Color(0x660000)),
         };
 
+        static List<Renderable> octagonObjects = new List<Renderable>
+        {
+            //Table
+            new YPlane(-500.01),
+            //Octagon
+            new Cuboid(Point3D.Zero, 800, 1001, 800, Color.Black) { reflectivity = 0.0, refractivity = 0.9, refractionIndex = RefractionIndexes.Glass }
+                & new RotatedObject(new Cuboid(Point3D.Zero, 800, 1000, 800, Color.White), Point3D.Zero, Math.PI / 4, 0)
+                - new Sphere(Point3D.Zero, 500, Color.White),
+            //Crazy sphere
+            new Sphere(Point3D.Zero, 300, Color.Blue) { reflectivity = 0.8 }
+        };
+
+        static List<Renderable> lampObjects = new List<Renderable>
+        {
+            //Floor
+            new YPlane(-500.01),
+        };
+
+        static List<Renderable> jiggyTileWallObjects;
+
+
         static Scene scene = new Scene
         {
             skyColor = new Color(154, 206, 235),
-            renderedObjects = wineGlassObjects,
+            renderedObjects = octagonObjects,
             lightSources = new LightSource[]
             {
                 //new LightSource(new Point3D( 1000, 3000,  1000), 10000),
