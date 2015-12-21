@@ -54,7 +54,7 @@ namespace Raytracer
             //}
 
 
-
+            InitializeScene();
 
             using (PixelWindow window = new PixelWindow(scene.options.imageWidth, scene.options.imageHeight, true))
             {
@@ -68,11 +68,6 @@ namespace Raytracer
                     while (Directory.Exists(scene.animationOptions.animationsBasePath + "Animation " + ++i)) ;
                     animationDirectory = "Animation " + i;
                     Directory.CreateDirectory(scene.animationOptions.animationsBasePath + animationDirectory);
-                }
-
-                if (scene.animationOptions.doAnimation && scene.animationOptions.animationFunction == null)
-                {
-                    scene.animationOptions.animationFunction = RotateAround();
                 }
 
                 do

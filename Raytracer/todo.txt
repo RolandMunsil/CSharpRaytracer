@@ -1,14 +1,14 @@
-﻿* dont initialize everything in variable definition - initialize in a methods. otherwise it causes typeinitilization errors + makes things annoying
-
- * 3D rendering (like side-by-side and stuff)
+﻿* 3D rendering (like side-by-side and stuff)
  * Colored light
  * Objects to make
    - Torus
    - Hyperbola(s)?
    - Pyramid?
+   - Cone
  * Lenslike camera
  * Orthographic projection
  * Bezier surfaces
  * Calculate pixel with floating point color componets
  * Revamp color system with La*b* / Lch, + spectrums
  * Material system - material has color/texture/colorfunc, refraction, reflection, diffuseness, etc.
+	- Separate geometry (the shape of the object) from behavior (reflectance, color, etc.)

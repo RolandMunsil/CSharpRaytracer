@@ -10,24 +10,39 @@ namespace Raytracer
 {
     class YPlane : Renderable
     {
+        private enum ColoringMode
+        {
+            SingleColor,
+            Checkerboard,
+            Texture
+        }
+
         double Y;
         private static readonly Vector3D Normal = new Vector3D(0, 1, 0);
 
-        bool hasColor;
+        ColoringMode coloringMode;
         Color color;
         System.Drawing.Bitmap bm;
 
         public YPlane(double y)
         {
             this.Y = y;
-            hasColor = false;
+            coloringMode = ColoringMode.Checkerboard;
+        }
+
+        public YPlane(double y, String textureFileName)
+        {
+            this.Y = y;
+            coloringMode = ColoringMode.Texture;
+            String s = Path.GetFullPath("../../../Textures/" + textureFileName);
+            bm = new System.Drawing.Bitmap(s);
         }
 
         public YPlane(double y, Color color)
         {
             this.Y = y;
+            coloringMode = ColoringMode.SingleColor;
             this.color = color;
-            hasColor = true;
         }
 
         public override Intersection GetNearestIntersection(Ray ray)
@@ -86,21 +101,18 @@ namespace Raytracer
 
         private Color ColorAt(double x, double z)
         {
-            lock (this)
+            switch(coloringMode)
             {
-                if (bm == null)
+                case ColoringMode.SingleColor: return color;
+                case ColoringMode.Checkerboard: return x.PMod(200) < 100 ^ z.PMod(200) < 100 ? Color.White : Color.Black;
+                case ColoringMode.Texture:
                 {
-                    String s = Path.GetFullPath("../../../Textures/Wood Texture 01.jpg");
-                    bm = new System.Drawing.Bitmap(s);
-                }
-                if (hasColor)
-                {
-                    return color;
-                }
-                //return x.PMod(20) < 10 ^ z.PMod(20) < 10 ? (Color)0x4A7023 : (Color)0x78AB46;
-                //return x.PMod(200) < 100 ^ z.PMod(200) < 100 ? Color.White : Color.Black;
-                //return x.PMod(200) < 100 ^ z.PMod(200) < 100 ? new Color(128, 64, 0) : new Color(236, 186, 94);
-                return new Color(bm.GetPixel((int)(x / 2).PMod(bm.Width), (int)(z / 2).PMod(bm.Height)).ToArgb());
+                    lock (bm)
+                    {
+                        return new Color(bm.GetPixel((int)(x / 2).PMod(bm.Width), (int)(z / 2).PMod(bm.Height)).ToArgb());
+                    }
+                } 
+                default: throw new InvalidOperationException("coloringMode has not been initialized.");
             }
         }
     }
